@@ -1,7 +1,7 @@
 use ark_ec::pairing::Pairing;
 use ark_std::log2;
 
-use crate::VKDPublicParameters;
+use crate::{VKDKey, VKDPublicParameters, VKDSpecification, structs::IronSpecification};
 use ark_poly::DenseMultilinearExtension;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use subroutines::{PolynomialCommitmentScheme, poly::DenseOrSparseMLE};
@@ -15,9 +15,23 @@ where
             Point = Vec<<E as Pairing>::ScalarField>,
         >,
 {
-    capacity: usize,
+    specification: IronSpecification,
     pcs_ck: MvPCS::ProverParam,
     pcs_vk: MvPCS::VerifierParam,
+}
+
+impl<E, MvPCS> VKDKey for IronPublicParameters<E, MvPCS>
+where
+    E: Pairing,
+    MvPCS: PolynomialCommitmentScheme<
+            E,
+            Polynomial = DenseOrSparseMLE<E::ScalarField>,
+            Point = Vec<<E as Pairing>::ScalarField>,
+        >,
+{
+    fn get_specification(&self) -> &dyn VKDSpecification {
+        &self.specification
+    }
 }
 
 impl<E, MvPCS> VKDPublicParameters for IronPublicParameters<E, MvPCS>
@@ -34,18 +48,15 @@ where
     type ClientKey = IronClientKey<E, MvPCS>;
 
     fn to_server_key(&self) -> Self::ServerKey {
-        IronServerKey::new(self.capacity, self.pcs_ck.clone())
+        IronServerKey::new(self.specification.clone(), self.pcs_ck.clone())
     }
 
     fn to_auditor_key(&self) -> Self::AuditorKey {
-        IronAuditorKey::new(self.capacity, self.pcs_vk.clone())
+        IronAuditorKey::new(self.specification.clone(), self.pcs_vk.clone())
     }
 
     fn to_client_key(&self) -> Self::ClientKey {
-        IronClientKey::new(log2(self.capacity) as usize, self.pcs_vk.clone())
-    }
-    fn get_capacity(&self) -> usize {
-        self.capacity
+        IronClientKey::new(self.specification.clone(), self.pcs_vk.clone())
     }
 }
 
@@ -58,11 +69,15 @@ where
             Point = Vec<<E as Pairing>::ScalarField>,
         >,
 {
-    pub fn new(capacity: usize, pcs_param: MvPCS::SRS) -> Self {
-        let (pcs_ck, pcs_vk) =
-            MvPCS::trim(pcs_param, None, Some(capacity.trailing_zeros() as usize)).unwrap();
+    pub fn new(specification: IronSpecification, pcs_param: MvPCS::SRS) -> Self {
+        let (pcs_ck, pcs_vk) = MvPCS::trim(
+            pcs_param,
+            None,
+            Some(specification.get_capacity().trailing_zeros() as usize),
+        )
+        .unwrap();
         Self {
-            capacity,
+            specification,
             pcs_ck,
             pcs_vk,
         }
@@ -78,7 +93,7 @@ where
             Point = Vec<<E as Pairing>::ScalarField>,
         >,
 {
-    capacity: usize,
+    specification: IronSpecification,
     pcs_prover_param: MvPCS::ProverParam,
 }
 
@@ -91,9 +106,9 @@ where
             Point = Vec<<E as Pairing>::ScalarField>,
         >,
 {
-    pub fn new(capacity: usize, pcs_prover_param: MvPCS::ProverParam) -> Self {
+    pub fn new(specification: IronSpecification, pcs_prover_param: MvPCS::ProverParam) -> Self {
         Self {
-            capacity,
+            specification,
             pcs_prover_param,
         }
     }
@@ -101,8 +116,19 @@ where
     pub fn get_pcs_prover_param(&self) -> &MvPCS::ProverParam {
         &self.pcs_prover_param
     }
-    pub fn get_capacity(&self) -> usize {
-        self.capacity
+}
+
+impl<E, MvPCS> VKDKey for IronServerKey<E, MvPCS>
+where
+    E: Pairing,
+    MvPCS: PolynomialCommitmentScheme<
+            E,
+            Polynomial = DenseOrSparseMLE<E::ScalarField>,
+            Point = Vec<<E as Pairing>::ScalarField>,
+        >,
+{
+    fn get_specification(&self) -> &dyn VKDSpecification {
+        &self.specification
     }
 }
 
@@ -115,7 +141,7 @@ where
             Point = Vec<<E as Pairing>::ScalarField>,
         >,
 {
-    capacity: usize,
+    specification: IronSpecification,
     pcs_verifier_param: MvPCS::VerifierParam,
 }
 
@@ -128,18 +154,28 @@ where
             Point = Vec<<E as Pairing>::ScalarField>,
         >,
 {
-    pub fn new(capacity: usize, pcs_verifier_param: MvPCS::VerifierParam) -> Self {
+    pub fn new(specification: IronSpecification, pcs_verifier_param: MvPCS::VerifierParam) -> Self {
         Self {
-            capacity,
+            specification,
             pcs_verifier_param,
         }
     }
     pub fn get_pcs_verifier_param(&self) -> &MvPCS::VerifierParam {
         &self.pcs_verifier_param
     }
+}
 
-    pub fn get_capacity(&self) -> usize {
-        self.capacity
+impl<E, MvPCS> VKDKey for IronAuditorKey<E, MvPCS>
+where
+    E: Pairing,
+    MvPCS: PolynomialCommitmentScheme<
+            E,
+            Polynomial = DenseOrSparseMLE<E::ScalarField>,
+            Point = Vec<<E as Pairing>::ScalarField>,
+        >,
+{
+    fn get_specification(&self) -> &dyn VKDSpecification {
+        &self.specification
     }
 }
 
@@ -153,7 +189,7 @@ where
             Point = Vec<<E as Pairing>::ScalarField>,
         >,
 {
-    log_capacity: usize,
+    specification: IronSpecification,
     pcs_verifier_param: MvPCS::VerifierParam,
 }
 
@@ -166,9 +202,9 @@ where
             Point = Vec<<E as Pairing>::ScalarField>,
         >,
 {
-    pub fn new(log_capacity: usize, pcs_verifier_param: MvPCS::VerifierParam) -> Self {
+    pub fn new(specification: IronSpecification, pcs_verifier_param: MvPCS::VerifierParam) -> Self {
         Self {
-            log_capacity,
+            specification,
             pcs_verifier_param,
         }
     }
@@ -176,7 +212,18 @@ where
     pub fn get_pcs_verifier_param(&self) -> &MvPCS::VerifierParam {
         &self.pcs_verifier_param
     }
-    pub fn get_log_capacity(&self) -> usize {
-        self.log_capacity
+}
+
+impl<E, MvPCS> VKDKey for IronClientKey<E, MvPCS>
+where
+    E: Pairing,
+    MvPCS: PolynomialCommitmentScheme<
+            E,
+            Polynomial = DenseOrSparseMLE<E::ScalarField>,
+            Point = Vec<<E as Pairing>::ScalarField>,
+        >,
+{
+    fn get_specification(&self) -> &dyn VKDSpecification {
+        &self.specification
     }
 }

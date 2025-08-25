@@ -2,7 +2,7 @@ pub(crate) mod errors;
 #[cfg(test)]
 mod tests;
 use crate::{
-    VKDDictionary, VKDLabel, VKDPublicParameters, VKDResult, VKDServer,
+    VKDDictionary, VKDKey, VKDLabel, VKDPublicParameters, VKDResult, VKDServer,
     bb::{
         BulletinBoard,
         dummybb::{DummyBB, IronEpochMessage},
@@ -78,7 +78,7 @@ where
 
     fn init(pp: &Self::PublicParameters) -> Self {
         Self {
-            dictionary: IronDictionary::new_with_capacity(pp.get_capacity()),
+            dictionary: IronDictionary::new_with_capacity(pp.get_specification().get_capacity()),
             key: pp.to_server_key(),
             label_aux: MvPCS::Aux::default(),
             value_aux: MvPCS::Aux::default(),
@@ -117,12 +117,8 @@ where
         // Commit to the diff commitment
         let mut rng = test_rng();
 
-        let (diff_label_com, mut diff_label_aux) = MvPCS::commit(
-            self.key.get_pcs_prover_param(),
-            &diff_label_mle,
-            Some(&mut rng),
-        )
-        .unwrap();
+        let (diff_label_com, mut diff_label_aux) =
+            MvPCS::commit(self.key.get_pcs_prover_param(), &diff_label_mle).unwrap();
         // Compute the diff aux
         MvPCS::update_aux(
             self.key.get_pcs_prover_param(),
@@ -240,12 +236,8 @@ where
         // Compute the difference MLE
         let diff_value_mle = &*new_value_mle.borrow() - &*current_value_mle.borrow();
         // Compute the commtment and the aux to the diff
-        let (diff_value_com, mut diff_value_aux) = MvPCS::commit(
-            self.key.get_pcs_prover_param(),
-            &diff_value_mle,
-            Some(&mut rng),
-        )
-        .unwrap();
+        let (diff_value_com, mut diff_value_aux) =
+            MvPCS::commit(self.key.get_pcs_prover_param(), &diff_value_mle).unwrap();
         MvPCS::update_aux(
             self.key.get_pcs_prover_param(),
             &diff_value_mle,
@@ -310,7 +302,6 @@ where
             &*label_ref,
             &index_boolean,
             &self.label_aux,
-            Some(&mut test_rng()),
             &mut transcript,
         )
         .unwrap();
@@ -320,7 +311,6 @@ where
             &*value_ref,
             &index_boolean,
             &self.value_aux,
-            Some(&mut test_rng()),
             &mut transcript,
         )
         .unwrap();

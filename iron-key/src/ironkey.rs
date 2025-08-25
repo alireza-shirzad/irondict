@@ -76,14 +76,13 @@ where
 
     fn setup(specification: Self::Specification) -> VKDResult<Self::PublicParameters> {
         let timer = start_timer!(|| "IronKey::setup");
-        let capacity = specification.get_capacity();
-        let real_capacity = capacity.next_power_of_two();
-        let num_vars = real_capacity.trailing_zeros() as usize;
+        let num_vars = specification.get_capacity().trailing_zeros() as usize;
         let mut rng = test_rng();
 
-        let srs = MvPCS::gen_srs_for_testing(None, &mut rng, num_vars, true).unwrap();
+        let srs =
+            MvPCS::gen_srs_for_testing(None, &mut rng, num_vars, specification.is_zk()).unwrap();
 
         end_timer!(timer);
-        Ok(IronPublicParameters::<E, MvPCS>::new(real_capacity, srs))
+        Ok(IronPublicParameters::<E, MvPCS>::new(specification, srs))
     }
 }

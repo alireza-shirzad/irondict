@@ -347,11 +347,14 @@ pub fn partially_eval_dense_poly_on_bool_point<F: Field>(
         .collect()
 }
 
-pub fn partially_eval_sparse_poly_on_bool_point<F: Field>(
-    sparse_poly: &SparseMultilinearExtension<F>,
+use std::ops::{Bound::Included, Bound::Excluded};
+
+#[inline]
+pub fn partially_eval_sparse_poly_on_bool_point<'a, F: 'a + Field>(
+    sparse_poly: &'a SparseMultilinearExtension<F>,
     index: usize,
     n: usize,
-) -> BTreeMap<usize, F> {
+) -> impl Iterator<Item = (usize, &'a F)> {
     debug_assert!(n > 0 && n.is_power_of_two(), "n must be a power of two");
     let total = 1usize << sparse_poly.num_vars;
     debug_assert!(n <= total, "n must be <= 2^num_vars");
@@ -360,14 +363,12 @@ pub fn partially_eval_sparse_poly_on_bool_point<F: Field>(
     debug_assert!(index < num_prefix_assignments, "index out of range");
 
     let base = index * n;
+    let mask = n - 1; // valid because n is power of two
 
-    // Collect only the non-zero entries (i.e., those present in the sparse map)
-    // that fall in the contiguous window [base, base + n), and rebase to [0, n).
     sparse_poly
         .evaluations
-        .range(base..base + n) // end is exclusive
-        .map(|(&global_idx, v)| (global_idx - base, *v))
-        .collect()
+        .range((Included(base), Excluded(base + n)))
+        .map(move |(&global_idx, v)| ((global_idx & mask), v))
 }
 
 pub fn fix_last_variables_boolean<F: Field>(
@@ -391,7 +392,7 @@ pub fn fix_last_variables_boolean_sparse<F: Field>(
     let index = bits_le_to_usize(point);
     // grab the contiguous window and rebase indices to [0 .. 2^n)
     let evals_map = partially_eval_sparse_poly_on_bool_point(poly, index, 1 << n);
-    let evals: Vec<(usize, F)> = evals_map.into_iter().collect();
+    let evals: Vec<(usize, F)> = evals_map.map(|(i, v)| (i, *v)).collect();
 
     SparseMultilinearExtension::from_evaluations(n, &evals)
 }

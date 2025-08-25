@@ -1,12 +1,12 @@
 pub(crate) mod errors;
 
+use crate::VKDKey;
+use ark_ec::pairing::Pairing;
 use std::{
     hash,
     marker::PhantomData,
     ops::{Add, Sub},
 };
-
-use ark_ec::pairing::Pairing;
 
 use ark_poly::Polynomial;
 use ark_std::{end_timer, start_timer};
@@ -131,7 +131,7 @@ where
         let (_label, _) = hash_to_mu_bits_with_offset::<E::ScalarField>(
             &self.label.to_string(),
             0,
-            self.key.get_log_capacity(),
+            self.key.get_specification().get_capacity().trailing_zeros() as usize,
         );
         end_timer!(hash);
         end_timer!(timer);

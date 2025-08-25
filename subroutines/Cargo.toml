@@ -36,3 +36,5 @@ parallel = [
     "ndarray/rayon",
 ]
 print-trace = ["arithmetic/print-trace", "ark-std/print-trace"]
+[profile.bench]
+debug = true

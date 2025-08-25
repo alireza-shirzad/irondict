@@ -1,7 +1,9 @@
 use std::sync::Arc;
 
 use crate::{
-    cfg_for_each_with_scratch, pcs::kzhk::structs::Tensor, PCSError, StructuredReferenceString,
+    cfg_for_each_with_scratch,
+    pcs::{kzhk::structs::Tensor, PCSGlobalParam},
+    PCSError, StructuredReferenceString,
 };
 use ark_ec::{
     pairing::Pairing, scalar_mul::BatchMulPreprocessing, AffineRepr, CurveGroup, PrimeGroup,
@@ -39,7 +41,13 @@ pub struct KZHKUniversalParams<E: Pairing> {
     // h: Another G1 generator
     h: E::G1Affine,
     // hiding_sparsity
-    hiding_sparsity: usize,
+    hiding_sparsity: Option<usize>,
+}
+
+impl<E: Pairing> PCSGlobalParam for KZHKUniversalParams<E> {
+    fn is_zk(&self) -> bool {
+        self.hiding_sparsity.is_some()
+    }
 }
 
 impl<E: Pairing> KZHKUniversalParams<E> {
@@ -51,7 +59,7 @@ impl<E: Pairing> KZHKUniversalParams<E> {
         v: E::G2Affine,
         g: E::G1Affine,
         h: E::G1Affine,
-        hiding_sparsity: usize,
+        hiding_sparsity: Option<usize>,
     ) -> Self {
         Self {
             dimensions,
@@ -86,7 +94,7 @@ impl<E: Pairing> KZHKUniversalParams<E> {
     pub fn get_h(&self) -> E::G1Affine {
         self.h
     }
-    pub fn get_hiding_sparsity(&self) -> usize {
+    pub fn get_hiding_sparsity(&self) -> Option<usize> {
         self.hiding_sparsity
     }
 }
@@ -98,7 +106,7 @@ pub struct KZHKProverParam<E: Pairing> {
     h_tensors: Arc<Vec<Tensor<E::G1Affine>>>,
     v_mat: Arc<Vec<Vec<E::G2Prepared>>>,
     h: E::G1Affine,
-    hiding_sparsity: usize,
+    hiding_sparsity: Option<usize>,
 }
 impl<E: Pairing> KZHKProverParam<E> {
     /// Create a new prover parameter
@@ -107,7 +115,7 @@ impl<E: Pairing> KZHKProverParam<E> {
         h_tensors: Arc<Vec<Tensor<E::G1Affine>>>,
         v_mat: Arc<Vec<Vec<E::G2Prepared>>>,
         h: E::G1Affine,
-        hiding_sparsity: usize,
+        hiding_sparsity: Option<usize>,
     ) -> Self {
         Self {
             dimensions,
@@ -134,11 +142,15 @@ impl<E: Pairing> KZHKProverParam<E> {
         self.h
     }
 
-    pub fn get_hiding_sparsity(&self) -> usize {
+    pub fn get_hiding_sparsity(&self) -> Option<usize> {
         self.hiding_sparsity
     }
 }
-
+impl<E: Pairing> PCSGlobalParam for KZHKVerifierParam<E> {
+    fn is_zk(&self) -> bool {
+        self.hiding_sparsity.is_some()
+    }
+}
 /// Verifier Parameters
 #[derive(CanonicalSerialize, CanonicalDeserialize, Clone, Debug)]
 pub struct KZHKVerifierParam<E: Pairing> {
@@ -147,7 +159,7 @@ pub struct KZHKVerifierParam<E: Pairing> {
     minus_v: E::G2Affine,
     v_mat: Arc<Vec<Vec<E::G2Prepared>>>,
     h: E::G1Affine,
-    hiding_sparsity: usize,
+    hiding_sparsity: Option<usize>,
 }
 
 impl<E: Pairing> KZHKVerifierParam<E> {
@@ -158,7 +170,7 @@ impl<E: Pairing> KZHKVerifierParam<E> {
         v: E::G2Affine,
         v_mat: Arc<Vec<Vec<E::G2Prepared>>>,
         h: E::G1Affine,
-        hiding_sparsity: usize,
+        hiding_sparsity: Option<usize>,
     ) -> Self {
         Self {
             dimensions,
@@ -190,8 +202,14 @@ impl<E: Pairing> KZHKVerifierParam<E> {
         self.h
     }
 
-    pub fn get_hiding_sparsity(&self) -> usize {
+    pub fn get_hiding_sparsity(&self) -> Option<usize> {
         self.hiding_sparsity
+    }
+}
+
+impl<E: Pairing> PCSGlobalParam for KZHKProverParam<E> {
+    fn is_zk(&self) -> bool {
+        self.hiding_sparsity.is_some()
     }
 }
 
@@ -205,7 +223,7 @@ impl<E: Pairing> StructuredReferenceString<E> for KZHKUniversalParams<E> {
             self.dimensions.clone(),
             self.h_tensors.clone(),
             self.v_mat.clone(),
-            self.h.clone(),
+            self.h,
             self.hiding_sparsity,
         )
     }
@@ -217,7 +235,7 @@ impl<E: Pairing> StructuredReferenceString<E> for KZHKUniversalParams<E> {
             self.h_tensors[self.dimensions.len() - 1].clone().into(),
             self.v,
             self.v_mat.clone(),
-            self.h.clone(),
+            self.h,
             self.hiding_sparsity,
         )
     }
@@ -235,10 +253,9 @@ impl<E: Pairing> StructuredReferenceString<E> for KZHKUniversalParams<E> {
     fn gen_srs_for_testing<R: Rng>(
         rng: &mut R,
         k: usize,
+        zk: bool,
         num_vars: usize,
     ) -> Result<KZHKUniversalParams<E>, PCSError> {
-
-
         // ----- Dimensions: split num_vars across k -----
         let d = num_vars / k;
         let remainder_d = num_vars % k;
@@ -367,8 +384,12 @@ impl<E: Pairing> StructuredReferenceString<E> for KZHKUniversalParams<E> {
 
         let v_mat = Arc::new(v_mat);
         end_timer!(v_mat_timer);
-
-        let hiding_sparsity = ceil_k_root_scaled(1u128 << num_vars, k as u32) as usize;
+        
+        let hiding_sparsity = if zk {
+            Some(ceil_k_root_scaled(1u128 << num_vars, k as u32) as usize)
+        } else {
+            None
+        };
 
         Ok(KZHKUniversalParams::new(
             (*dimensions_arc).clone(),
@@ -381,7 +402,6 @@ impl<E: Pairing> StructuredReferenceString<E> for KZHKUniversalParams<E> {
         ))
     }
 }
-
 
 // Helper: mixed-radix decode of a flat index into coordinates (C-order).
 #[inline]

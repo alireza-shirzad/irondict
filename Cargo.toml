@@ -50,3 +50,8 @@ ark-ff = { git = "https://github.com/arkworks-rs/algebra.git" }
 ark-ec = { git = "https://github.com/arkworks-rs/algebra.git" }
 ark-serialize = { git = "https://github.com/arkworks-rs/algebra.git" }
 ark-bn254 = { git = "https://github.com/arkworks-rs/algebra.git" }
+
+[profile.bench]
+debug = true        # emit DWARF
+lto = "off"         # avoid link-time inlining across crates
+opt-level = 3       # keep it fast but still symbolizable

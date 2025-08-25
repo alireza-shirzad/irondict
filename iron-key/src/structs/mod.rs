@@ -1,7 +1,7 @@
 use ark_ec::pairing::Pairing;
 use ark_ff::PrimeField;
+use ark_serialize::CanonicalSerialize;
 use num_bigint::BigUint;
-use subroutines::PolynomialCommitmentScheme;
 
 use crate::{VKDLabel, VKDSpecification};
 
@@ -11,7 +11,8 @@ pub mod pp;
 pub mod self_audit;
 pub mod update;
 
-pub struct IronSpecification{
+#[derive(Clone, CanonicalSerialize)]
+pub struct IronSpecification {
     capacity: usize,
     zk: bool,
 }

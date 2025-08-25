@@ -23,7 +23,7 @@ fn sample_msm_inputs(n: usize, seed: u64) -> (Vec<G1Affine>, Vec<Fr>) {
 
 /// Measure E::G1::msm with `n` bases/scalars.
 /// Try sizes that are big enough to be meaningful but won’t OOM.
-#[divan::bench(args = [83, 512, 1024, 2048, 4096, 8192])]
+#[divan::bench(args = [32,64,128,256, 512, 1024, 2048, 4096, 8192])]
 fn msm_g1(bencher: Bencher, n: usize) {
     let (bases, scalars) = sample_msm_inputs(n, 42);
 

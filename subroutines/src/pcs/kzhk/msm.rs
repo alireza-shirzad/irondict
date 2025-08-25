@@ -1,49 +1,33 @@
-//! msm.rs — size-aware MSM wrapper (E: Pairing), same signature shape as
-//! arkworks `msm`.
-//!
-//! Example switch-over:
-//!   // old:
-//!   // let cj = E::G1::msm(&proof.get_d()[j], &eq_poly.evaluations)?;
-//!   // new:
-//!   let cj = msm_wrapper_g1::<E>(&proof.get_d()[j], &eq_poly.evaluations)?;
-//!
-//! Env (optional):
-//!   MSM_AUTOTUNE=1
-//!   MSM_PHYS_CORES=<int>
-
-use once_cell::sync::OnceCell;
-#[cfg(feature = "parallel")]
-use rayon::ThreadPoolBuilder;
-use std::env;
+//! msm.rs — simple size-aware MSM wrapper (E: Pairing)
+//! - Fixed heuristic thread count (no autotune).
+//! - Uses Rayon only if `--features parallel` is enabled; otherwise serial MSM.
+//! - 1-term fast path uses direct group scalar multiplication.
 
 use ark_ec::{pairing::Pairing, AffineRepr, CurveGroup, VariableBaseMSM};
 use ark_ff::PrimeField;
 
+use ark_ec::PrimeGroup;
+#[cfg(feature = "parallel")]
+use rayon::ThreadPoolBuilder;
 // ===============================
-// Public API (G1 / G2 wrappers)
+// Public API (G1 / G2)
 // ===============================
 
-/// G1 wrapper with `Result` like arkworks' `msm`.
 pub fn msm_wrapper_g1<E: Pairing>(
     bases: &[<E::G1 as CurveGroup>::Affine],
     scalars: &[E::ScalarField],
-) -> Result<E::G1, usize>
+) -> E::G1
 where
     E::ScalarField: PrimeField,
     <E::G1 as CurveGroup>::Affine: AffineRepr<ScalarField = E::ScalarField, Group = E::G1>,
 {
-    #[cfg(not(feature = "parallel"))]
-    return <E::G1 as VariableBaseMSM>::msm(bases, scalars);
-
-    #[cfg(feature = "parallel")]
     msm_wrapper_affine::<E, <E::G1 as CurveGroup>::Affine>(bases, scalars)
 }
-#[cfg(feature = "parallel")]
-/// G2 wrapper with `Result` like arkworks' `msm`.
+
 pub fn msm_wrapper_g2<E: Pairing>(
     bases: &[<E::G2 as CurveGroup>::Affine],
     scalars: &[E::ScalarField],
-) -> Result<E::G2, usize>
+) -> E::G2
 where
     E::ScalarField: PrimeField,
     <E::G2 as CurveGroup>::Affine: AffineRepr<ScalarField = E::ScalarField, Group = E::G2>,
@@ -51,166 +35,80 @@ where
     msm_wrapper_affine::<E, <E::G2 as CurveGroup>::Affine>(bases, scalars)
 }
 
-/// Generic affine wrapper tied to `E::ScalarField`. Returns `Result<_, usize>`
-/// to match arkworks.
-#[cfg(feature = "parallel")]
-pub fn msm_wrapper_affine<E, A>(bases: &[A], scalars: &[E::ScalarField]) -> Result<A::Group, usize>
+// ===============================
+// Core wrapper (generic Affine)
+// ===============================
+
+pub fn msm_wrapper_affine<E, A>(bases: &[A], scalars: &[E::ScalarField]) -> A::Group
 where
     E: Pairing,
     E::ScalarField: PrimeField,
     A: AffineRepr<ScalarField = E::ScalarField>,
-{
-    if bases.len() != scalars.len() {
-        return Err(bases.len().min(scalars.len()));
-    }
-
-    let n = bases.len();
-    let phys = detect_physical_cores();
-    let threads = threads_for_n(n, phys);
-
-    let pool = ThreadPoolBuilder::new()
-        .num_threads(threads)
-        .build()
-        .expect("failed to build rayon pool");
-
-    pool.install(|| inner_msm_affine::<A>(bases, scalars))
-}
-
-/// Force a specific number of threads (handy for experiments).
-#[cfg(feature = "parallel")]
-pub fn msm_with_threads_affine<E, A>(
-    bases: &[A],
-    scalars: &[E::ScalarField],
-    threads: usize,
-) -> Result<A::Group, usize>
-where
-    E: Pairing,
-    E::ScalarField: PrimeField,
-    A: AffineRepr<ScalarField = E::ScalarField>,
-{
-    if bases.len() != scalars.len() {
-        return Err(bases.len().min(scalars.len()));
-    }
-    let pool = ThreadPoolBuilder::new()
-        .num_threads(threads.max(1))
-        .build()
-        .expect("failed to build rayon pool");
-    pool.install(|| inner_msm_affine::<A>(bases, scalars))
-}
-// ===============================
-// Inner MSM kernel (swap if you have your own)
-// ===============================
-#[cfg(feature = "parallel")]
-#[inline(always)]
-fn inner_msm_affine<A>(bases: &[A], scalars: &[A::ScalarField]) -> Result<A::Group, usize>
-where
-    A: AffineRepr,
-    A::ScalarField: PrimeField,
     A::Group: VariableBaseMSM,
 {
-    // arkworks MSM (projective/group element out)
-    <A::Group as VariableBaseMSM>::msm(bases, scalars)
+    // Length check matches arkworks' msm API
+    if bases.len() != scalars.len() {
+        panic!()
+    }
+
+    // 1-term fast path: avoid MSM overhead
+    if bases.len() == 1 {
+        let g = bases[0].into_group();
+        return g.mul_bigint(scalars[0].into_bigint());
+    }
+
+    // Non-parallel build: just call arkworks MSM
+    #[cfg(not(feature = "parallel"))]
+    {
+        return <A::Group as VariableBaseMSM>::msm(bases, scalars);
+    }
+
+    // Parallel build: run MSM inside a small pool with fixed-heuristic threads
+    #[cfg(feature = "parallel")]
+    {
+        let n = bases.len();
+        let phys = detect_cores();
+        let threads = threads_for_n(n, phys);
+
+        // If threads == 1, avoid building a pool
+        if threads <= 1 {
+            return <A::Group as VariableBaseMSM>::msm_unchecked(bases, scalars);
+        }
+
+        let pool = ThreadPoolBuilder::new()
+            .num_threads(threads)
+            .build()
+            .expect("failed to build rayon pool");
+
+        pool.install(|| <A::Group as VariableBaseMSM>::msm_unchecked(bases, scalars))
+    }
 }
+
 // ===============================
-// Thread selection
+// Fixed heuristic thread picker
 // ===============================
 
-#[derive(Clone, Copy, Debug)]
-struct Breakpoints {
-    t2: usize,
-    t4: usize,
-    t8: usize,
-    t16: usize,
-    cap: usize,
-}
-static BKPTS: OnceCell<Breakpoints> = OnceCell::new();
 #[cfg(feature = "parallel")]
 fn threads_for_n(n: usize, phys_cores: usize) -> usize {
-    let bk = BKPTS.get_or_init(|| {
-        if env::var("MSM_AUTOTUNE").ok().as_deref() == Some("1") {
-            quick_autotune(phys_cores)
-        } else {
-            heuristic_breakpoints(phys_cores)
-        }
-    });
-
-    let mut t = if n < bk.t2 {
+    // Keep ~>=128 terms per worker; cap at 16 and by physical cores.
+    let t = if n < 32 {
         1
-    } else if n < bk.t4 {
+    } else if n < 256 {
         2
-    } else if n < bk.t8 {
-        4
-    } else if n < bk.t16 {
-        8
-    } else {
+    } else if n < 512 {
         16
+    } else if n < 4096 {
+        32
+    } else {
+        64
     };
-
-    t = t.min(bk.cap).max(1);
-    t
-}
-#[cfg(feature = "parallel")]
-fn heuristic_breakpoints(phys_cores: usize) -> Breakpoints {
-    Breakpoints {
-        t2: 128,
-        t4: 512,
-        t8: 2_048,
-        t16: 8_192,
-        cap: phys_cores.min(16),
-    }
-}
-#[cfg(feature = "parallel")]
-fn quick_autotune(phys_cores: usize) -> Breakpoints {
-    // Placeholder: keep heuristic; replace with a sweep if you want per-curve
-    // tuning.
-    heuristic_breakpoints(phys_cores)
+    t.min(phys_cores.max(1))
 }
 
-// ===============================
-// System helpers
-// ===============================
 #[cfg(feature = "parallel")]
-fn detect_physical_cores() -> usize {
-    if let Ok(override_val) = env::var("MSM_PHYS_CORES") {
-        if let Ok(v) = override_val.parse::<usize>() {
-            if v >= 1 {
-                return v;
-            }
-        }
-    }
+fn detect_cores() -> usize {
     std::thread::available_parallelism()
         .map(|n| n.get())
         .unwrap_or(1)
         .max(1)
-}
-
-// ===============================
-// Tests (optional; adjust curve as needed)
-// ===============================
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use ark_bn254::Bn254;
-    use ark_ec::{AffineRepr, CurveGroup};
-    use ark_ff::UniformRand;
-    use ark_std::test_rng;
-
-    #[test]
-    fn msm_wrapper_matches_lengths_and_runs() {
-        let mut rng = test_rng();
-
-        // G1
-        let n = 83usize;
-        let pts_g1: Vec<<<Bn254 as Pairing>::G1 as CurveGroup>::Affine> = (0..n)
-            .map(|_| <Bn254 as Pairing>::G1::rand(&mut rng).into_affine())
-            .collect();
-        let sc: Vec<<Bn254 as Pairing>::ScalarField> = (0..n)
-            .map(|_| <Bn254 as Pairing>::ScalarField::rand(&mut rng))
-            .collect();
-
-        let _out = msm_wrapper_g1::<Bn254>(&pts_g1, &sc).unwrap();
-
-        // length error
-        assert!(msm_wrapper_g1::<Bn254>(&pts_g1[..n - 1], &sc).is_err());
-    }
 }

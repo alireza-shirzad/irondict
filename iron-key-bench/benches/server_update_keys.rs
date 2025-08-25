@@ -12,7 +12,6 @@ use iron_key::{
     structs::pp::IronPublicParameters, // Import the correct PP type
     structs::{IronLabel, IronSpecification},
 };
-use iron_key_bench::KZH_PARAM;
 use once_cell::sync::Lazy;
 use subroutines::pcs::kzhk::KZHK;
 

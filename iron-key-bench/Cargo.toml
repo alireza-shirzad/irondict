@@ -29,3 +29,8 @@ default = ["std"]
 std = ["ark-ff/std", "ark-std/std"]
 print-trace = ["ark-std/print-trace", "subroutines/print-trace", "iron-key/print-trace"]
 parallel = ["std", "iron-key/parallel", "subroutines/parallel", "rayon","ark-ec/parallel","ark-ff/parallel","ark-poly/parallel","ark-serialize/parallel","ark-std/parallel"]
+
+[profile.bench]
+debug = true        # emit DWARF
+lto = "off"         # avoid link-time inlining across crates
+opt-level = 3       # keep it fast but still symbolizable

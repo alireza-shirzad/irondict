@@ -5,11 +5,14 @@ use ark_serialize::{
     self, CanonicalDeserialize, CanonicalSerialize, Compress, Read, SerializationError, Valid,
     Validate, Write,
 };
-use ark_std::{cfg_iter_mut, ops::Sub, Zero};
+use ark_std::{cfg_into_iter, cfg_iter, cfg_iter_mut, ops::Sub, Zero};
 use derivative::Derivative;
 use ndarray::{ArrayD, IxDyn};
 #[cfg(feature = "parallel")]
-use rayon::iter::{IndexedParallelIterator, IntoParallelRefMutIterator, ParallelIterator};
+use rayon::iter::{
+    IndexedParallelIterator, IntoParallelIterator, IntoParallelRefIterator,
+    IntoParallelRefMutIterator, ParallelIterator,
+};
 use std::ops::{Add, Deref, DerefMut};
 ///////////////// Commitment //////////////////////
 
@@ -137,17 +140,13 @@ impl<E: Pairing> Add for KZHKAuxInfo<E> {
             rhs.d_bool.as_ref().unwrap().len(),
             "Auxiliary information must have the same length"
         );
-        let out_d_bool = self
-            .d_bool
-            .as_ref()
-            .unwrap()
-            .iter()
-            .zip(rhs.d_bool.as_ref().unwrap().iter())
+        let out_d_bool = cfg_iter!(self.d_bool.as_ref().unwrap())
+            .zip(cfg_iter!(rhs.d_bool.as_ref().unwrap()))
             .map(|(ra, rb)| {
                 assert_eq!(ra.len(), rb.len(), "column count mismatch in a row");
-                ra.iter()
+                cfg_iter!(ra)
                     .cloned()
-                    .zip(rb.iter().cloned())
+                    .zip(cfg_iter!(rb))
                     .map(|(x, y)| (x + y).into_affine())
                     .collect()
             })
@@ -174,17 +173,13 @@ impl<E: Pairing> Sub for KZHKAuxInfo<E> {
             rhs.d_bool.as_ref().unwrap().len(),
             "Auxiliary information must have the same length"
         );
-        let out_d_bool = self
-            .d_bool
-            .as_ref()
-            .unwrap()
-            .iter()
-            .zip(rhs.d_bool.as_ref().unwrap().iter())
+        let out_d_bool = cfg_iter!(self.d_bool.as_ref().unwrap())
+            .zip(cfg_iter!(rhs.d_bool.as_ref().unwrap()))
             .map(|(ra, rb)| {
                 assert_eq!(ra.len(), rb.len(), "column count mismatch in a row");
-                ra.iter()
+                cfg_iter!(ra)
                     .cloned()
-                    .zip(rb.iter().cloned())
+                    .zip(cfg_iter!(rb))
                     .map(|(x, y)| (x - y).into_affine())
                     .collect()
             })
@@ -286,10 +281,12 @@ impl<E: Pairing> core::ops::Mul<E::ScalarField> for KZHKOpeningProof<E> {
         if self == Self::default() {
             return self;
         }
-        let out_d = self
-            .d
-            .into_iter()
-            .map(|row| row.into_iter().map(|x| (x * rhs).into_affine()).collect())
+        let out_d = cfg_into_iter!(self.d)
+            .map(|row| {
+                cfg_into_iter!(row)
+                    .map(|x| (x * rhs).into_affine())
+                    .collect()
+            })
             .collect();
         let mut f_out = self.f;
         mul_poly_by_cnst_in_place(&mut f_out, rhs);
@@ -634,12 +631,12 @@ where
     match poly {
         DenseOrSparseMLE::Dense(dense) => {
             cfg_iter_mut!(dense.evaluations).for_each(|x| {
-                *x = *x * c;
+                *x *= c;
             });
         },
         DenseOrSparseMLE::Sparse(sparse) => {
             cfg_iter_mut!(sparse.evaluations).for_each(|(_, x)| {
-                *x = *x * c;
+                *x *= c;
             });
         },
     }

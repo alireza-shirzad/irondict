@@ -24,7 +24,7 @@ fn test_single_helper(
             .collect::<Vec<_>>(),
         false => (0..nv).map(|_| Fr::rand(&mut rng)).collect::<Vec<_>>(),
     };
-    let (com, mut aux) = KZHK::<E>::commit(&ck, &poly, if zk { Some(&mut rng) } else { None })?;
+    let (com, mut aux) = KZHK::<E>::commit(&ck, &poly)?;
     KZHK::<E>::update_aux(&ck, &poly, &com, &mut aux)?;
     let (proof, value) = KZHK::<E>::open(
         &ck,
@@ -32,7 +32,6 @@ fn test_single_helper(
         &poly,
         &point,
         &aux,
-        if zk { Some(&mut rng) } else { None },
         &mut prover_transcript,
     )?;
     let mut verif_transcript = IOPTranscript::new(b"test_kzhk");

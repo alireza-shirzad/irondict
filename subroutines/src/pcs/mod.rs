@@ -12,7 +12,6 @@ use std::{borrow::Borrow, default, fmt::Debug, hash::Hash};
 use transcript::IOPTranscript;
 
 /// This trait defines APIs for polynomial commitment schemes.
-/// Note that for our usage of PCS, we do not require the hiding property.
 pub trait PolynomialCommitmentScheme<E: Pairing> {
     type Config: Clone + Debug + Default;
     type ProverParam: Clone + Sync;
@@ -55,10 +54,9 @@ pub trait PolynomialCommitmentScheme<E: Pairing> {
         supported_num_vars: Option<usize>,
     ) -> Result<(Self::ProverParam, Self::VerifierParam), PCSError>;
 
-    fn commit<R: Rng>(
+    fn commit(
         prover_param: impl Borrow<Self::ProverParam>,
         poly: &Self::Polynomial,
-        hiding: Option<&mut R>,
     ) -> Result<(Self::Commitment, Self::Aux), PCSError>;
 
     fn update_aux(
@@ -70,20 +68,18 @@ pub trait PolynomialCommitmentScheme<E: Pairing> {
         unimplemented!()
     }
 
-    fn open<R: Rng>(
+    fn open(
         prover_param: impl Borrow<Self::ProverParam>,
         commitment: &Self::Commitment,
         polynomial: &Self::Polynomial,
         point: &Self::Point,
         aux: &Self::Aux,
-        hiding: Option<&mut R>,
         _transcript: &mut IOPTranscript<E::ScalarField>,
     ) -> Result<(Self::Proof, Self::Evaluation), PCSError>;
 
     fn multi_open(
         _prover_param: impl Borrow<Self::ProverParam>,
         commitment: &Self::Commitment,
-
         _polynomials: &[&Self::Polynomial],
         _point: &Self::Point,
         _auxes: &[Self::Aux],
@@ -115,11 +111,11 @@ pub trait PolynomialCommitmentScheme<E: Pairing> {
 }
 
 /// API definitions for structured reference string
-pub trait StructuredReferenceString<E: Pairing>: Sized {
+pub trait StructuredReferenceString<E: Pairing>: Sized + PCSGlobalParam {
     /// Prover parameters
-    type ProverParam;
+    type ProverParam: PCSGlobalParam;
     /// Verifier parameters
-    type VerifierParam;
+    type VerifierParam:PCSGlobalParam;
 
     /// Extract the prover parameters from the public parameters.
     fn extract_prover_param(&self, supported_size: usize) -> Self::ProverParam;
@@ -151,6 +147,11 @@ pub trait StructuredReferenceString<E: Pairing>: Sized {
     fn gen_srs_for_testing<R: Rng>(
         rng: &mut R,
         k: usize,
+        zk: bool,
         supported_size: usize,
     ) -> Result<Self, PCSError>;
+}
+
+pub trait PCSGlobalParam {
+    fn is_zk(&self) -> bool;
 }

@@ -140,16 +140,20 @@ pub trait VKDSpecification {
 }
 
 pub trait VKDPublicParameters {
-    type ServerKey;
-    type AuditorKey;
-    type ClientKey;
+    type ServerKey: VKDKey;
+    type AuditorKey: VKDKey;
+    type ClientKey: VKDKey;
 
     fn to_server_key(&self) -> Self::ServerKey;
     fn to_auditor_key(&self) -> Self::AuditorKey;
     fn to_client_key(&self) -> Self::ClientKey;
-    fn get_capacity(&self) -> usize;
 }
 
 pub trait VKDLabel<E: Pairing>: Debug + Hash + Eq + ToString + Clone {
     fn to_field(&self) -> E::ScalarField;
+}
+
+
+pub trait VKDKey {
+    fn get_specification(&self) -> &dyn VKDSpecification;
 }
