@@ -911,6 +911,6 @@ pub fn compute_k(poly_size: usize, is_zk: bool) -> usize {
     // if is_zk {
         // (0.5 * (n as f64).ln()) as usize
     // } else {
-        poly_size
+        (poly_size/2) as usize
     // }
 }
