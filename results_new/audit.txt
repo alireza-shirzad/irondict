@@ -1,0 +1,36 @@
+   ╰─ audit                │               │               │               │         │
+      ├─ 20  
+Cache miss: Creating new IronPublicParameters for log_capacity = 20
+Loading SRS
+12.76 ms      │ 12.76 ms      │ 12.76 ms      │ 12.76 ms      │ 1       │ 1
+      ├─ 21  
+Cache miss: Creating new IronPublicParameters for log_capacity = 21
+Loading SRS
+13.32 ms      │ 13.32 ms      │ 13.32 ms      │ 13.32 ms      │ 1       │ 1
+      ├─ 22  
+Cache miss: Creating new IronPublicParameters for log_capacity = 22
+Loading SRS
+14.27 ms      │ 14.27 ms      │ 14.27 ms      │ 14.27 ms      │ 1       │ 1
+      ├─ 23  
+Cache miss: Creating new IronPublicParameters for log_capacity = 23
+Loading SRS
+15.61 ms      │ 15.61 ms      │ 15.61 ms      │ 15.61 ms      │ 1       │ 1
+      ├─ 24  
+Cache miss: Creating new IronPublicParameters for log_capacity = 24
+Loading SRS
+16.05 ms      │ 16.05 ms      │ 16.05 ms      │ 16.05 ms      │ 1       │ 1
+      ├─ 25  
+Cache miss: Creating new IronPublicParameters for log_capacity = 25
+Loading SRS
+16.37 ms      │ 16.37 ms      │ 16.37 ms      │ 16.37 ms      │ 1       │ 1
+      ├─ 26  
+Cache miss: Creating new IronPublicParameters for log_capacity = 26
+Loading SRS
+17.52 ms      │ 17.52 ms      │ 17.52 ms      │ 17.52 ms      │ 1       │ 1
+      ├─ 27  
+Cache miss: Creating new IronPublicParameters for log_capacity = 27
+Loading SRS
+21.97 ms      │ 21.97 ms      │ 21.97 ms      │ 21.97 ms      │ 1       │ 1
+      ├─ 28  
+Cache miss: Creating new IronPublicParameters for log_capacity = 28
+Computing SRS
