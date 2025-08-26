@@ -373,6 +373,25 @@ impl<E: Pairing> Add for KZHKOpeningProof<E> {
                     .collect()
             })
             .collect();
+        if self.f == DenseOrSparseMLE::zero() {
+            return KZHKOpeningProof {
+                d: out_d,
+                f: rhs.f,
+                r_hide: None,
+                y_r: None,
+                rho_prime: None,
+            };
+        }
+
+        if rhs.f == DenseOrSparseMLE::zero() {
+            return KZHKOpeningProof {
+                d: out_d,
+                f: self.f,
+                r_hide: None,
+                y_r: None,
+                rho_prime: None,
+            };
+        }
 
         let f_out = match (&self.f, &rhs.f) {
             (DenseOrSparseMLE::Dense(ref a), DenseOrSparseMLE::Dense(ref b)) => {
