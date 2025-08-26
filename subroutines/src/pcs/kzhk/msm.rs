@@ -60,7 +60,7 @@ where
     // Non-parallel build: just call arkworks MSM
     #[cfg(not(feature = "parallel"))]
     {
-        return <A::Group as VariableBaseMSM>::msm(bases, scalars);
+        return <A::Group as VariableBaseMSM>::msm_unchecked(bases, scalars);
     }
 
     // Parallel build: run MSM inside a small pool with fixed-heuristic threads
