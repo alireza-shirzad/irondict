@@ -1,5 +1,4 @@
 Setting up directory and publishing N = 100000000 entries (this may take a while)...
-Done initial publish: epoch EpochHash(1, [95, 150, 181, 68, 217, 161, 59, 31, 244, 36, 54, 247, 250, 208, 213, 58, 209, 122, 46, 70, 54, 246, 242, 182, 181, 39, 211, 80, 65, 104, 24, 144])
 Benchmarking server_lookup_produce_proof: Warming up for 3.0000 s
 Warning: Unable to complete 100 samples in 5.0s. You may wish to increase target time to 5.0s, enable flat sampling, or reduce sample count to 70.
 Benchmarking server_lookup_produce_proof: Collecting 100 samples in estima
