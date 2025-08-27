@@ -15,7 +15,7 @@ use iron_key::{
 use once_cell::sync::Lazy;
 use subroutines::pcs::kzhk::KZHK;
 
-const SHARED_LOG_CAPACITY: u64 = 32;
+const SHARED_LOG_CAPACITY: u64 = 24;
 /// Triplet carried around by Divan.
 #[derive(Copy, Clone, Debug)]
 struct Params(

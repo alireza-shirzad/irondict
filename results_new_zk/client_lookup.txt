@@ -1,45 +1,6 @@
-╰─ client_lookup                                │               │               │               │         │
-   ╰─ lookup_prove_after_updates                │               │               │               │         │
+
       ├─ 20                       Cache miss: Creating new IronPublicParameters for log_capacity = 20
 Loading SRS
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
-proof size = 3488
-client key size = 668958
 proof size = 3488
 client key size = 668958
 20.82 ms      │ 21 ms         │ 20.85 ms      │ 20.86 ms      │ 20      │ 20
@@ -47,37 +8,9 @@ client key size = 668958
 Loading SRS
 proof size = 3776
 client key size = 735810
-proof size = 3776
-client key size = 735810
-proof size = 3776
-client key size = 735810
-proof size = 3776
-client key size = 735810
-proof size = 3776
-client key size = 735810
-proof size = 3776
-client key size = 735810
-proof size = 3776
-client key size = 735810
-proof size = 3776
-client key size = 735810
-proof size = 3776
-client key size = 735810
-proof size = 3776
-client key size = 735810
-proof size = 3776
-client key size = 735810
-proof size = 3776
-client key size = 735810
-proof size = 3776
-client key size = 735810
 18.97 ms      │ 19.23 ms      │ 18.99 ms      │ 19.01 ms      │ 13      │ 13
       ├─ 22                       Cache miss: Creating new IronPublicParameters for log_capacity = 22
 Loading SRS
-proof size = 3824
-client key size = 735826
-proof size = 3824
-client key size = 735826
 proof size = 3824
 client key size = 735826
 26.4 ms       │ 26.5 ms       │ 26.41 ms      │ 26.44 ms      │ 3       │ 3

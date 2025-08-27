@@ -1,47 +1,52 @@
-Setting up directory and publishing N = 1000000 entries (this may take a while)...
-Done initial publish: epoch EpochHash(1, [96, 173, 114, 230, 110, 141, 163, 179, 239, 50, 4, 201, 64, 220, 94, 13, 34, 136, 219, 149, 236, 223, 206, 180, 153, 23, 64, 0, 175, 37, 217, 175])
+Setting up directory and publishing N = 100000000 entries (this may take a while)...
+Done initial publish: epoch EpochHash(1, [95, 150, 181, 68, 217, 161, 59, 31, 244, 36, 54, 247, 250, 208, 213, 58, 209, 122, 46, 70, 54, 246, 242, 182, 181, 39, 211, 80, 65, 104, 24, 144])
+Benchmarking server_lookup_produce_proof: Warming up for 3.0000 s
+Warning: Unable to complete 100 samples in 5.0s. You may wish to increase target time to 5.0s, enable flat sampling, or reduce sample count to 70.
+Benchmarking server_lookup_produce_proof: Collecting 100 samples in estima
 server_lookup_produce_proof
-                        time:   [994.01 µs 1.0219 ms 1.0657 ms]
-Found 14 outliers among 100 measurements (14.00%)
-  5 (5.00%) low mild
-  5 (5.00%) high mild
-  4 (4.00%) high severe
-
-client_lookup_verify    time:   [444.84 µs 446.16 µs 447.64 µs]
-Found 10 outliers among 100 measurements (10.00%)
-  1 (1.00%) low mild
-  6 (6.00%) high mild
-  3 (3.00%) high severe
-
-Benchmarking server_lookup_updated_key: Warming up for 3.0000 s
-Warning: Unable to complete 100 samples in 5.0s. You may wish to increase target time to 6.1s, enable flat sampling, or reduce sample count to 60.
-server_lookup_updated_key
-                        time:   [1.2091 ms 1.2196 ms 1.2358 ms]
-Found 7 outliers among 100 measurements (7.00%)
-  5 (5.00%) high mild
-  2 (2.00%) high severe
-
-client_lookup_updated_key_verify
-                        time:   [449.44 µs 451.39 µs 454.02 µs]
-Found 10 outliers among 100 measurements (10.00%)
-  1 (1.00%) low severe
-  1 (1.00%) low mild
-  2 (2.00%) high mild
-  6 (6.00%) high severe
-
-server_history_proof    time:   [11.079 ms 11.132 ms 11.196 ms]
+                        time:   [980.39 µs 981.81 µs 983.29 µs]
 Found 13 outliers among 100 measurements (13.00%)
-  4 (4.00%) high mild
-  9 (9.00%) high severe
-
-client_history_verify   time:   [7.5745 ms 7.5919 ms 7.6132 ms]
-Found 7 outliers among 100 measurements (7.00%)
-  2 (2.00%) high mild
+  8 (8.00%) high mild
   5 (5.00%) high severe
 
+Benchmarking client_lookup_verify: Collecting 100 samples in estimated 6.8
+client_lookup_verify    time:   [447.92 µs 447.98 µs 448.06 µs]
+Found 15 outliers among 100 measurements (15.00%)
+  2 (2.00%) low mild
+  7 (7.00%) high mild
+  6 (6.00%) high severe
+
+Benchmarking server_lookup_updated_key: Warming up for 3.0000 s
+Warning: Unable to complete 100 samples in 5.0s. You may wish to increase target time to 5.8s, enable flat sampling, or reduce sample count to 60.
+Benchmarking server_lookup_updated_key: Collecting 100 samples in estimate
+server_lookup_updated_key
+                        time:   [1.1380 ms 1.1388 ms 1.1397 ms]
+Found 15 outliers among 100 measurements (15.00%)
+  5 (5.00%) low mild
+  4 (4.00%) high mild
+  6 (6.00%) high severe
+
+Benchmarking client_lookup_updated_key_verify: Collecting 100 samples in e
+client_lookup_updated_key_verify
+                        time:   [442.36 µs 442.67 µs 443.03 µs]
+Found 19 outliers among 100 measurements (19.00%)
+  12 (12.00%) high mild
+  7 (7.00%) high severe
+
+Benchmarking server_history_proof: Collecting 100 samples in estimated 5.0
+server_history_proof    time:   [12.633 ms 12.650 ms 12.668 ms]
+Found 6 outliers among 100 measurements (6.00%)
+  6 (6.00%) high mild
+
+Benchmarking client_history_verify: Collecting 100 samples in estimated 5.
+client_history_verify   time:   [7.5686 ms 7.5758 ms 7.5836 ms]
+Found 19 outliers among 100 measurements (19.00%)
+  1 (1.00%) high mild
+  18 (18.00%) high severe
+
 Publishing large AUDIT_UPDATES = 1200000 to create audit proof (this may take a while)...
-Audit generation (publish + audit proof) took: 37.511551292s
-Audit proof (serialized size): 293760800 bytes (~280.15 MB)
+Audit generation (publish + audit proof) took: 63.074950325s
+Audit proof (serialized size): 1216710852 bytes (~1160.35 MB)
 === Summary (ad-hoc measurements) ===
-Audit generation time (publish + produce audit proof): 37.511551292s
-Audit verification time (client): 5.709953042s
+Audit generation time (publish + produce audit proof): 63.074950325s
+Audit verification time (client): 11.03854478s
