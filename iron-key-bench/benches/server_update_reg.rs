@@ -85,6 +85,7 @@ fn prepare_prover_update_prove_inputs(
     let initial_batch: HashMap<_, _> = (1..=initial_batch_size_val)
         .map(|i| (IronLabel::new(&i.to_string()), Fr::from(i as u64)))
         .collect();
+
     if initial_batch_size_val > 0 {
         // Only update if there's an initial batch
         server
@@ -114,13 +115,13 @@ pub const PARAMS: &[Params] = &{
     // The inner loop for k (log_update_size) runs from 0 to n-2.
     // The number of iterations is the sum of (n-1) for n from 20 to 32.
     // Sum = (19 + 20 + ... + 31) = 13 * (19 + 31) / 2 = 325.
-    const PARAMS_ARRAY_SIZE: usize = 325;
+    const PARAMS_ARRAY_SIZE: usize = 32;
 
     const fn build_params() -> [Params; PARAMS_ARRAY_SIZE] {
-        let mut out = [Params(4, 0, 0); PARAMS_ARRAY_SIZE];
+        let mut out = [Params(4, 0, 2); PARAMS_ARRAY_SIZE];
         let mut i: usize = 0;
 
-        let mut n: usize = 20; // log_capacity starts from 20
+        let mut n: usize = 32; // log_capacity starts from 20
         while n <= 32 {
             let mut k = 1; // log_update_size
             while k <= n - 2 {
