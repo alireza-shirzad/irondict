@@ -14,7 +14,7 @@ use rayon::prelude::*;
 type Config = akd::WhatsAppV1Configuration;
 
 // === TUNE THESE ===
-const N: usize = 1_000_000_000; // number of initial keys (set to desired N)
+const N: usize = 100_000_000; // number of initial keys (set to desired N)
 const LOOKUP_PROBES: usize = 10; // number of random lookups to benchmark
 const UPDATE_ROUNDS: usize = 20; // change one key this many times
 const AUDIT_UPDATES: usize = 2000 * 60 * 10; // as you requested (1_200_000)
