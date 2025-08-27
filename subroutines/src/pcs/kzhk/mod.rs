@@ -132,10 +132,11 @@ where
         poly: &Self::Polynomial,
     ) -> Result<(Self::Commitment, Self::Aux), PCSError> {
         let timer = start_timer!(|| "KZH::Commit");
-        if !prover_param.borrow().is_zk() {
-            return Ok(Self::commit_non_zk(prover_param, poly).unwrap());
-        }
-        let result = Ok(Self::commit_zk(prover_param, poly).unwrap());
+        let result = if !prover_param.borrow().is_zk() {
+            Ok(Self::commit_non_zk(prover_param, poly).unwrap())
+        } else {
+            Self::commit_zk(prover_param, poly)
+        };
         end_timer!(timer);
         result
     }
@@ -325,14 +326,15 @@ impl<E: Pairing> KZHK<E> {
         // Committing to the r(X) polynomial
         let (r_hide, r_aux) = Self::commit(prover_param, &r_poly_wrapped)?;
         // Computing the auxiliary of r(x)
-        // let _ = Self::update_aux_inner(prover_param, &r_poly_wrapped, &r_hide, &mut r_aux);
+        // let _ = Self::update_aux_inner(prover_param, &r_poly_wrapped, &r_hide, &mut
+        // r_aux);
         let rho = r_aux.get_tau();
         // Computing the opening and evaluation of r(x)
         // let (r_opening, y_r) =
-            // Self::open_non_zk(prover_param, commitment, &r_poly_wrapped, point, &r_aux)?;
+        // Self::open_non_zk(prover_param, commitment, &r_poly_wrapped, point, &r_aux)?;
         let dummy_aux = KZHKAuxInfo::default();
         let (r_opening, y_r) =
-        Self::open_sparse_non_bool_inner(prover_param, &r_poly, point, &dummy_aux)?;
+            Self::open_sparse_non_bool_inner(prover_param, &r_poly, point, &dummy_aux)?;
         // Getting the challenge alpha
         let alpha = E::ScalarField::one();
         // Computing rho_prime
@@ -615,7 +617,6 @@ impl<E: Pairing> KZHK<E> {
         debug_assert!(k >= 2, "need at least 2 blocks to build d_i's");
 
         // Build prefix sums of dimensions up to each block (exclusive of the last)
-        let prefix_timer = start_timer!(|| "KZH::CompAux_Sparse::PrefixSums");
         let prefix_vars_vec: Vec<usize> = {
             let mut prefix_vars: usize = 0;
             dimensions
@@ -627,10 +628,8 @@ impl<E: Pairing> KZHK<E> {
                 })
                 .collect()
         };
-        end_timer!(prefix_timer);
 
         // Compute d_bool without shared mutation; preserve order across j.
-        let d_bool_timer = start_timer!(|| "KZH::CompAux_Sparse::D_Bool");
         let d_bool: Vec<Vec<E::G1Affine>> = {
             cfg_into_iter!(0..k - 1)
                 .map(|j| {
@@ -668,7 +667,6 @@ impl<E: Pairing> KZHK<E> {
                 })
                 .collect()
         };
-        end_timer!(d_bool_timer);
 
         aux.set_d_bool(d_bool);
         end_timer!(timer);
@@ -909,8 +907,8 @@ macro_rules! cfg_for_each_with_scratch {
 pub fn compute_k(poly_size: usize, is_zk: bool) -> usize {
     let n: u128 = 1 << poly_size;
     // if is_zk {
-        // (0.5 * (n as f64).ln()) as usize
+    // (0.5 * (n as f64).ln()) as usize
     // } else {
-        (poly_size/2) as usize
+    (poly_size / 2) as usize
     // }
 }
