@@ -62,9 +62,9 @@ fn bench_akd(c: &mut Criterion) {
     // --- Setup once ---
     // For heavy N you may prefer to create directory in a separate machine step.
     // We'll measure operations after the initial publish.
-    eprintln!("Setting up directory and publishing N = {N} entries (this may take a while)...");
+    println!("Setting up directory and publishing N = {N} entries (this may take a while)...");
     let (akd, initial_epoch_hash, keys) = setup_dir_and_publish(N);
-    eprintln!("Done initial publish: epoch {:?}", initial_epoch_hash);
+    println!("Done initial publish: epoch {:?}", initial_epoch_hash);
 
     // Make a tokio runtime to use during benchmark iterations
     let rt = tokio::runtime::Runtime::new().unwrap();
@@ -208,7 +208,7 @@ fn bench_akd(c: &mut Criterion) {
     });
 
     // --- AUDIT: append a large batch of new keys/updates and get audit proof ---
-    eprintln!("Publishing large AUDIT_UPDATES = {AUDIT_UPDATES} to create audit proof (this may take a while)...");
+    println!("Publishing large AUDIT_UPDATES = {AUDIT_UPDATES} to create audit proof (this may take a while)...");
     // create updates; choose half new keys, half updating existing keys to mimic mixed workload
     let mut audit_entries = Vec::with_capacity(AUDIT_UPDATES);
     for i in 0..AUDIT_UPDATES {
@@ -234,7 +234,7 @@ fn bench_akd(c: &mut Criterion) {
         // total server time we will report = publish_dur + audit_dur (both server-side work)
         (publish_dur + audit_dur, audit_proof, root_before, new_epoch.1)
     };
-    eprintln!("Audit generation (publish + audit proof) took: {:?}", audit_gen_time);
+    println!("Audit generation (publish + audit proof) took: {:?}", audit_gen_time);
 
 
     // measure client verification time for audit proof
