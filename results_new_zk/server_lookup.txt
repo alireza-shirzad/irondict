@@ -61,5 +61,6 @@ Prepared server with updates: 4200
 Loading SRS
 Prepared server with updates: 4456
 22.35 ms      │ 22.35 ms      │ 22.35 ms      │ 22.35 ms      │ 1       │ 1
+      ├─ 32                       Cache miss: Creating new IronPublicParameters for log_capacity = 31
 Prepared server with updates: 4472
 33.19 ms      │ 33.19 ms      │ 33.19 ms      │ 33.19 ms      │ 1       │ 1
