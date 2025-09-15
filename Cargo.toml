@@ -46,11 +46,17 @@ rustdoc-args = ["--html-in-header", "../docs-header.html"]
 
 [patch.crates-io]
 ark-std = { git = "https://github.com/arkworks-rs/std" }
-ark-poly = { git = "https://github.com/arkworks-rs/algebra.git" }
-ark-ff = { git = "https://github.com/arkworks-rs/algebra.git" }
-ark-ec = { git = "https://github.com/arkworks-rs/algebra.git" }
-ark-serialize = { git = "https://github.com/arkworks-rs/algebra.git" }
-ark-bn254 = { git = "https://github.com/arkworks-rs/algebra.git" }
+# ark-poly = { git = "https://github.com/arkworks-rs/algebra.git" }
+# ark-ff = { git = "https://github.com/arkworks-rs/algebra.git" }
+# ark-ec = { git = "https://github.com/arkworks-rs/algebra.git" }
+# ark-serialize = { git = "https://github.com/arkworks-rs/algebra.git" }
+# ark-bn254 = { git = "https://github.com/arkworks-rs/algebra.git" }
+
+ark-poly = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }
+ark-ff = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }
+ark-ec = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }
+ark-serialize = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }
+ark-bn254 = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/twist-shout" }
 
 [profile.bench]
 debug = true # emit DWARF
