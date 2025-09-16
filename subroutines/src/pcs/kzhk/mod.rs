@@ -78,9 +78,12 @@ where
         zk: bool,
     ) -> Result<Self::SRS, PCSError> {
         let k = conf.unwrap_or_else(|| compute_k(supported_size, zk));
-        let srs_path = current_dir()
-            .unwrap()
-            .join(format!("./srs_{:?}_{}.bin", k, supported_size));
+        let srs_path = current_dir().unwrap().join(format!(
+            "./srs_{:?}_{}_{}.bin",
+            k,
+            supported_size,
+            std::any::type_name::<E>()
+        ));
         let srs = if srs_path.exists() {
             eprintln!("Loading SRS");
             let mut buffer = Vec::new();
