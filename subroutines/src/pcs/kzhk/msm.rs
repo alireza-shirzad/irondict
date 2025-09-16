@@ -68,7 +68,7 @@ where
     {
         let n = bases.len();
         let phys = detect_cores();
-        let threads = threads_for_n(n, phys);
+        let threads = 1; // threads_for_n(n, phys);
 
         // If threads == 1, avoid building a pool
         if threads <= 1 {
