@@ -2,8 +2,9 @@ use std::collections::LinkedList;
 
 use ark_ec::pairing::Pairing;
 
-use ark_serialize::CanonicalSerialize;
+use ark_serialize::{CanonicalSerialize, Compress};
 use derivative::Derivative;
+use ed25519_dalek::{Signer, SigningKey};
 use subroutines::{PolynomialCommitmentScheme, poly::DenseOrSparseMLE};
 
 use crate::{
@@ -13,6 +14,9 @@ use crate::{
 };
 
 use super::{BulletinBoard, errors::BulletinBoardError};
+
+// Static signing key for dummy bulletin board usage only; replace for real deployments.
+const SIGNING_KEY_BYTES: [u8; 32] = *b"dummy bulletin board signing key";
 
 #[derive(Clone)]
 pub enum IronEpochMessage<
@@ -99,7 +103,7 @@ pub struct DummyBB<
         > + Send
         + Sync,
 > {
-    ledger: LinkedList<IronEpochMessage<E, MvPCS>>,
+    ledger: LinkedList<(IronEpochMessage<E, MvPCS>, Vec<u8>)>,
     size: usize,
 }
 
@@ -114,7 +118,7 @@ where
         + Sync,
 {
     pub fn get_last_reg_update_message(&self) -> Option<&IronEpochRegMessage<E, MvPCS>> {
-        for message in self.ledger.iter() {
+        for (message, _) in self.ledger.iter() {
             if let IronEpochMessage::IronEpochRegMessage(reg_msg) = message {
                 return Some(reg_msg);
             }
@@ -124,7 +128,7 @@ where
 
     pub fn get_second_last_reg_update_message(&self) -> Option<&IronEpochRegMessage<E, MvPCS>> {
         let mut count = 0;
-        for message in self.ledger.iter().rev() {
+        for (message, _) in self.ledger.iter().rev() {
             if let IronEpochMessage::IronEpochRegMessage(reg_msg) = message {
                 count += 1;
                 if count == 2 {
@@ -136,7 +140,7 @@ where
     }
 
     pub fn get_last_key_update_message(&self) -> Option<&IronEpochKeyMessage<E, MvPCS>> {
-        for message in self.ledger.iter() {
+        for (message, _) in self.ledger.iter() {
             if let IronEpochMessage::IronEpochKeyMessage(key_msg) = message {
                 return Some(key_msg);
             }
@@ -145,7 +149,7 @@ where
     }
     pub fn get_second_last_key_update_message(&self) -> Option<&IronEpochKeyMessage<E, MvPCS>> {
         let mut count = 0;
-        for message in self.ledger.iter().rev() {
+        for (message, _) in self.ledger.iter().rev() {
             if let IronEpochMessage::IronEpochKeyMessage(key_msg) = message {
                 count += 1;
                 if count == 2 {
@@ -170,14 +174,23 @@ impl<
     type Message = IronEpochMessage<E, MvPCS>;
 
     fn broadcast(&mut self, message: IronEpochMessage<E, MvPCS>) -> VKDResult<()> {
-        self.size += message.serialized_size(ark_serialize::Compress::Yes);
-        self.ledger.push_front(message);
+        let mut serialized_message = Vec::new();
+        message
+            .serialize_with_mode(&mut serialized_message, Compress::Yes)
+            .expect("serialization into an in-memory buffer should not fail");
+
+        let signing_key = SigningKey::from_bytes(&SIGNING_KEY_BYTES);
+        let signature = signing_key.sign(&serialized_message).to_bytes().to_vec();
+
+        self.size += message.serialized_size(Compress::Yes);
+        self.ledger.push_front((message, signature));
         Ok(())
     }
 
     fn read_last(&self) -> VKDResult<&IronEpochMessage<E, MvPCS>> {
         self.ledger
             .front()
+            .map(|(message, _)| message)
             .ok_or(VKDError::BulletinBoardError(BulletinBoardError::Empty))
     }
 
@@ -185,6 +198,7 @@ impl<
         self.ledger
             .iter()
             .nth(epoch_num)
+            .map(|(message, _)| message)
             .ok_or(VKDError::BulletinBoardError(
                 BulletinBoardError::OutOfBounds,
             ))

@@ -1027,6 +1027,7 @@ dependencies = [
  "ark-serialize",
  "ark-std",
  "derivative",
+ "ed25519-dalek",
  "num-bigint",
  "rayon",
  "sha2",
