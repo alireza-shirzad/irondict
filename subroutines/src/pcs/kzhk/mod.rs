@@ -7,25 +7,18 @@ use crate::{
         },
         PCSGlobalParam,
     },
-    poly::{self, DenseOrSparseMLE},
-    Commitment, PCSError, PolynomialCommitmentScheme, StructuredReferenceString,
+    poly::DenseOrSparseMLE,
+    PCSError, PolynomialCommitmentScheme, StructuredReferenceString,
 };
 use ark_ec::{pairing::Pairing, AffineRepr, CurveGroup, VariableBaseMSM};
 use ark_ff::One;
-use ark_poly::{
-    univariate::DenseOrSparsePolynomial, DenseMultilinearExtension, MultilinearExtension,
-    SparseMultilinearExtension,
-};
+use ark_poly::{DenseMultilinearExtension, MultilinearExtension, SparseMultilinearExtension};
 use ark_serialize::CanonicalDeserialize;
 use ark_std::{
-    cfg_into_iter, cfg_iter, cfg_iter_mut, end_timer, log2,
-    rand::{Rng, RngCore},
-    start_timer, test_rng, Zero,
+    cfg_into_iter, cfg_iter, cfg_iter_mut, end_timer, rand::Rng, start_timer, test_rng, Zero,
 };
-use smallvec::SmallVec;
 use std::{
     borrow::Borrow,
-    collections::BTreeMap,
     env::current_dir,
     fs::File,
     io::{BufReader, BufWriter, Read, Write},
@@ -38,10 +31,9 @@ pub mod structs;
 use arithmetic::{
     bits_le_to_usize,
     multilinear_polynomial::{
-        evaluate_last_sparse, fix_last_variables, fix_last_variables_boolean,
-        fix_last_variables_boolean_sparse, fix_last_variables_sparse,
-        partially_eval_dense_poly_on_bool_point, partially_eval_sparse_poly_on_bool_point,
-        rand_sparse_mle,
+        fix_last_variables, fix_last_variables_boolean, fix_last_variables_boolean_sparse,
+        fix_last_variables_sparse, partially_eval_dense_poly_on_bool_point,
+        partially_eval_sparse_poly_on_bool_point, rand_sparse_mle,
     },
     virtual_polynomial::build_eq_x_r,
 };
@@ -60,9 +52,12 @@ pub struct KZHK<E: Pairing> {
     k: usize,
 }
 
+use std::ops::Neg;
+
 impl<E> PolynomialCommitmentScheme<E> for KZHK<E>
 where
     E: Pairing,
+    <E as Pairing>::G2Affine: Neg<Output = <E as Pairing>::G2Affine>,
 {
     type Config = usize;
     type ProverParam = KZHKProverParam<E>;
@@ -83,9 +78,12 @@ where
         zk: bool,
     ) -> Result<Self::SRS, PCSError> {
         let k = conf.unwrap_or_else(|| compute_k(supported_size, zk));
-        let srs_path = current_dir()
-            .unwrap()
-            .join(format!("../srs/srs_{:?}_{}.bin", k, supported_size));
+        let srs_path = current_dir().unwrap().join(format!(
+            "./srs_{:?}_{}_{}.bin",
+            k,
+            supported_size,
+            std::any::type_name::<E>()
+        ));
         let srs = if srs_path.exists() {
             eprintln!("Loading SRS");
             let mut buffer = Vec::new();
@@ -227,7 +225,10 @@ where
     }
 }
 
-impl<E: Pairing> KZHK<E> {
+impl<E: Pairing> KZHK<E>
+where
+    <E as Pairing>::G2Affine: Neg<Output = <E as Pairing>::G2Affine>,
+{
     fn commit_zk(
         prover_param: impl Borrow<KZHKProverParam<E>>,
         poly: &DenseOrSparseMLE<E::ScalarField>,

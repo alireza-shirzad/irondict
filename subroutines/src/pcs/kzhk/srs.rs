@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{ops::Neg, sync::Arc};
 
 use crate::{
     cfg_for_each_with_scratch,
@@ -162,7 +162,10 @@ pub struct KZHKVerifierParam<E: Pairing> {
     hiding_sparsity: Option<usize>,
 }
 
-impl<E: Pairing> KZHKVerifierParam<E> {
+impl<E: Pairing> KZHKVerifierParam<E>
+where
+    <E as Pairing>::G2Affine: Neg<Output = <E as Pairing>::G2Affine>,
+{
     /// Create a new verifier parameter
     pub fn new(
         dimensions: Vec<usize>,
@@ -213,7 +216,10 @@ impl<E: Pairing> PCSGlobalParam for KZHKProverParam<E> {
     }
 }
 
-impl<E: Pairing> StructuredReferenceString<E> for KZHKUniversalParams<E> {
+impl<E: Pairing> StructuredReferenceString<E> for KZHKUniversalParams<E>
+where
+    <E as Pairing>::G2Affine: Neg<Output = <E as Pairing>::G2Affine>,
+{
     type ProverParam = KZHKProverParam<E>;
     type VerifierParam = KZHKVerifierParam<E>;
 
@@ -384,7 +390,7 @@ impl<E: Pairing> StructuredReferenceString<E> for KZHKUniversalParams<E> {
 
         let v_mat = Arc::new(v_mat);
         end_timer!(v_mat_timer);
-        
+
         let hiding_sparsity = if zk {
             Some(ceil_k_root_scaled(1u128 << num_vars, k as u32) as usize)
         } else {
