@@ -1,4 +1,8 @@
-use std::{collections::HashMap, fmt};
+use std::{
+    collections::HashMap,
+    fmt,
+    sync::{Arc, Mutex},
+};
 
 use ark_bn254::{Bn254, Fr};
 use ark_serialize::CanonicalSerialize;
@@ -7,21 +11,20 @@ use iron_key::{
     VKD,
     VKDServer,
     bb::dummybb::DummyBB,
-    ironkey::IronKey, // Assuming IronKey::setup is the correct path
+    ironkey::IronKey,
     server::IronServer,
-    structs::pp::IronPublicParameters, // Import the correct PP type
+    structs::pp::IronPublicParameters,
     structs::{IronLabel, IronSpecification},
 };
 use once_cell::sync::Lazy;
 use subroutines::pcs::kzhk::KZHK;
 
-const SHARED_LOG_CAPACITY: u64 = 26;
 /// Triplet carried around by Divan.
 #[derive(Copy, Clone, Debug)]
 struct Params(
     pub u64, // log_capacity
     pub u64, // log_update_size
-    pub u64, // initial_batch_size
+    pub u64, // log_initial_batch_size
 );
 
 impl fmt::Display for Params {
@@ -34,32 +37,36 @@ impl fmt::Display for Params {
     }
 }
 
-// Corrected type alias for the Public Parameters returned by setup and used by
-// init
 type AppPublicParameters = IronPublicParameters<Bn254, KZHK<Bn254>>;
 
-// Determine the shared log_capacity from your PARAMS definition.
+// Per-capacity PP cache so the bench can sweep multiple log_capacities
+// in one run (mirrors the pattern used in audit.rs / client_lookup.rs).
+// Building the SRS dominates wall time, so each (log_capacity) entry
+// is computed once and reused across every (log_update_size) row that
+// uses it.
+static PP_CACHE: Lazy<Mutex<HashMap<u64, Arc<AppPublicParameters>>>> =
+    Lazy::new(|| Mutex::new(HashMap::new()));
 
-// Lazily initialize PP. It will be computed only once.
-// SHARED_PP is now of the type returned by IronKey::setup
-static SHARED_PP: Lazy<AppPublicParameters> = Lazy::new(|| {
-    eprintln!(
-        "\nInitializing SHARED_PP (IronPublicParameters) for log_capacity = {}...\n",
-        SHARED_LOG_CAPACITY
-    );
-    let system_spec = IronSpecification::new(1usize << SHARED_LOG_CAPACITY, true);
-    // IronKey::<..., IronLabel> specifies the generics for the IronKey struct
-    // itself, its `setup` method then returns Result<IronPublicParameters<E,
-    // Pcs>, _>
-    IronKey::<Bn254, KZHK<Bn254>, IronLabel>::setup(system_spec)
-        .expect("Failed to setup shared IronPublicParameters")
-});
+fn get_or_create_pp(log_capacity: u64) -> Arc<AppPublicParameters> {
+    let mut cache = PP_CACHE.lock().unwrap_or_else(|e| e.into_inner());
+    cache
+        .entry(log_capacity)
+        .or_insert_with(|| {
+            eprintln!(
+                "\nCache miss: Creating new IronPublicParameters for log_capacity = {}",
+                log_capacity
+            );
+            let system_spec = IronSpecification::new(1usize << log_capacity, true);
+            let pp = IronKey::<Bn254, KZHK<Bn254>, IronLabel>::setup(system_spec)
+                .expect("Failed to setup IronPublicParameters");
+            Arc::new(pp)
+        })
+        .clone()
+}
 
 /// Builds a server, a warm-up batch, and the real update batch.
-/// Now takes a reference to the pre-computed AppPublicParameters.
 fn prepare_prover_update_prove_inputs(
-    pp: &'static AppPublicParameters, // Use the static reference to the shared public parameters
-    _log_capacity: u64,               // Kept for consistency, but actual capacity is from pp
+    pp: &AppPublicParameters,
     log_update_size: u64,
     log_initial_batch_size: u64,
 ) -> (
@@ -68,7 +75,6 @@ fn prepare_prover_update_prove_inputs(
     DummyBB<Bn254, KZHK<Bn254>>,
 ) {
     let initial_batch_size = 1 << log_initial_batch_size;
-    // IronServer::init expects &IronPublicParameters<E, Pcs>
     let mut server: IronServer<Bn254, KZHK<Bn254>, IronLabel> = IronServer::init(pp);
     let mut bulletin_board = DummyBB::default();
 
@@ -93,21 +99,38 @@ fn prepare_prover_update_prove_inputs(
     (server, update_batch, bulletin_board)
 }
 
+/// Compile-time list of (log_capacity, log_update_size) pairs. Sweeps
+/// log_update_size for each of three log_capacity points that match
+/// the aegon regime sizes: 22 (small), 26 (medium), 32 (large). The
+/// update_size range covers the aegon publish_bench batches (small
+/// uses 64..2048, large uses 4096..131072).
 pub const PARAMS: &[Params] = &{
     const INIT: u64 = 2;
-    const ARRAY_SIZE: usize = (SHARED_LOG_CAPACITY - 1) as usize;
+    const LOG_CAPS: [u64; 3] = [22, 28, 34];
+    const UPDATE_MIN: u64 = 4;  // log_update_size lower bound (= batch 16)
+    const UPDATE_MAX: u64 = 17; // log_update_size upper bound (= batch 131072)
+    const ROWS_PER_CAP: usize = (UPDATE_MAX - UPDATE_MIN + 1) as usize;
+    const ARRAY_SIZE: usize = LOG_CAPS.len() * ROWS_PER_CAP;
 
-    const fn build_light() -> [Params; ARRAY_SIZE] {
-        let mut out = [Params(SHARED_LOG_CAPACITY, 1, 1); ARRAY_SIZE];
-        let mut i = 0;
-        while i < ARRAY_SIZE {
-            let k = i as u64;
-            out[i] = Params(SHARED_LOG_CAPACITY, k, INIT);
-            i += 1;
+    const fn build_params() -> [Params; ARRAY_SIZE] {
+        let mut out = [Params(0, 0, INIT); ARRAY_SIZE];
+        let mut i: usize = 0;
+        let mut cap_idx: usize = 0;
+        while cap_idx < LOG_CAPS.len() {
+            let n = LOG_CAPS[cap_idx];
+            let mut k = UPDATE_MIN;
+            while k <= UPDATE_MAX {
+                if i < ARRAY_SIZE {
+                    out[i] = Params(n, k, INIT);
+                }
+                i += 1;
+                k += 1;
+            }
+            cap_idx += 1;
         }
         out
     }
-    build_light()
+    build_params()
 };
 
 #[divan::bench(
@@ -115,16 +138,11 @@ pub const PARAMS: &[Params] = &{
     args         = PARAMS
 )]
 fn light_update_keys(bencher: Bencher, Params(cap, upd, init): Params) {
-    assert_eq!(
-        cap, SHARED_LOG_CAPACITY,
-        "Benchmark log_capacity does not match SHARED_PP's log_capacity."
-    );
-
-    // Access the shared, lazily-initialized public parameters.
-    let pp_ref: &'static AppPublicParameters = &*SHARED_PP;
+    let pp_arc = get_or_create_pp(cap);
+    let pp_ref = &*pp_arc;
 
     let (mut server, update_batch, mut bb) =
-        prepare_prover_update_prove_inputs(pp_ref, cap, upd, init);
+        prepare_prover_update_prove_inputs(pp_ref, upd, init);
     let bb_in_size = bb.serialized_size(ark_serialize::Compress::Yes);
     bencher.bench_local(|| {
         server.update_keys(&update_batch, &mut bb).unwrap();

@@ -5,6 +5,7 @@ mod kzh_opening;
 mod server_lookup;
 mod server_update_keys;
 mod server_update_reg;
+mod setup;
 use ark_bn254 as E;
 use ark_bn254::{Fr, G1Affine, G1Projective};
 use ark_ec::{CurveGroup, VariableBaseMSM};

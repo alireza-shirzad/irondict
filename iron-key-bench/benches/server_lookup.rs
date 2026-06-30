@@ -72,8 +72,10 @@ fn server_with_updates(
 }
 
 /// Benchmark `lookup_prove` after different-sized update batches.
-/// The `args` list controls `log_capacity` values.
-#[divan::bench(    max_time     = 1,args = [31])]
+/// The `args` list controls `log_capacity` values. Three points pinned
+/// to match aegon regimes (22 = small, 26 = medium, 32 = large) so
+/// overlay plots align across systems.
+#[divan::bench(max_time = 1, args = [22, 28, 34])]
 fn lookup_prove_after_updates(bencher: Bencher, log_capacity_arg: usize) {
     bencher
         // build a brand-new (server, bb, label) for *each* iteration

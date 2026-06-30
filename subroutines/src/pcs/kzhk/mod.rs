@@ -903,12 +903,24 @@ macro_rules! cfg_for_each_with_scratch {
         }
     }};
 }
-// TODO: Check if this is optimum
-pub fn compute_k(poly_size: usize, is_zk: bool) -> usize {
-    let n: u128 = 1 << poly_size;
-    // if is_zk {
-    // (0.5 * (n as f64).ln()) as usize
-    // } else {
-    (poly_size / 2) as usize
-    // }
+/// Mirrors aegon's `optimal_kzh_k` table (akd/src/aegon/presets.rs).
+/// Picked so an irondict bench at log_capacity=N uses the same KZH-k
+/// block parameter the aegon sharded deployment would pick for a
+/// shard of that log_capacity — keeps the two systems' prover/proof
+/// trade-offs directly comparable in the paper plots.
+pub fn compute_k(poly_size: usize, _is_zk: bool) -> usize {
+    let k = match poly_size {
+        0 => 1,
+        1..=5 => 2,
+        6..=14 => 3,
+        15..=19 => 5,
+        20 => 6,
+        21..=23 => 7,
+        24..=26 => 8,
+        27..=28 => 9,
+        29..=31 => 10,
+        32..=34 => 11,
+        _ => 12,
+    };
+    k.min(poly_size.max(1))
 }

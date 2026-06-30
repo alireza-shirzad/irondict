@@ -108,30 +108,34 @@ fn prepare_prover_update_prove_inputs(
 }
 
 /// Compile-time list of (log_capacity, log_update_size) triplets.
+/// Sweeps log_update_size for each of three log_capacity points that
+/// match the aegon regime sizes: 22 (small), 26 (medium), 32 (large).
+/// The inner log_update_size sweep matches the aegon publish_bench
+/// range — log2(batch) covers small batches (4) up through the
+/// 2^17-batch (131072) used in aegon-large's publish bench.
 pub const PARAMS: &[Params] = &{
     const INIT: usize = 2; // log_initial_batch_size
-    // Calculation for array size:
-    // The outer loop for n (log_capacity) runs from 20 to 32.
-    // The inner loop for k (log_update_size) runs from 0 to n-2.
-    // The number of iterations is the sum of (n-1) for n from 20 to 32.
-    // Sum = (19 + 20 + ... + 31) = 13 * (19 + 31) / 2 = 325.
-    const PARAMS_ARRAY_SIZE: usize = 32;
+    const LOG_CAPS: [usize; 3] = [22, 28, 34];
+    const UPDATE_MIN: usize = 4;  // log_update_size lower bound (= batch 16)
+    const UPDATE_MAX: usize = 17; // log_update_size upper bound (= batch 131072)
+    const ROWS_PER_CAP: usize = UPDATE_MAX - UPDATE_MIN + 1;
+    const PARAMS_ARRAY_SIZE: usize = LOG_CAPS.len() * ROWS_PER_CAP;
 
     const fn build_params() -> [Params; PARAMS_ARRAY_SIZE] {
         let mut out = [Params(4, 0, 2); PARAMS_ARRAY_SIZE];
         let mut i: usize = 0;
-
-        let mut n: usize = 32; // log_capacity starts from 20
-        while n <= 32 {
-            let mut k = 1; // log_update_size
-            while k <= n - 2 {
+        let mut cap_idx: usize = 0;
+        while cap_idx < LOG_CAPS.len() {
+            let n = LOG_CAPS[cap_idx];
+            let mut k = UPDATE_MIN;
+            while k <= UPDATE_MAX {
                 if i < PARAMS_ARRAY_SIZE {
                     out[i] = Params(n, k, INIT);
                 }
                 i += 1;
                 k += 1;
             }
-            n += 1;
+            cap_idx += 1;
         }
         out
     }

@@ -1,0 +1,668 @@
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /home/hh3453_nyu_edu/irondict/subroutines/Cargo.toml
+workspace: /home/hh3453_nyu_edu/irondict/Cargo.toml
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /home/hh3453_nyu_edu/irondict/iron-key-bench/Cargo.toml
+workspace: /home/hh3453_nyu_edu/irondict/Cargo.toml
+warning: virtual workspace defaulting to `resolver = "1"` despite one or more workspace members being on edition 2024 which implies `resolver = "3"`
+note: to keep the current resolver, specify `workspace.resolver = "1"` in the workspace root's manifest
+note: to use the edition 2024 resolver, specify `workspace.resolver = "3"` in the workspace root's manifest
+note: for more details see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+warning: unused import: `univariate::DenseOrSparsePolynomial`
+ --> arithmetic/src/multilinear_polynomial.rs:4:5
+  |
+4 |     univariate::DenseOrSparsePolynomial, MultilinearExtension, SparseMultilinearExtension,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `IntoParallelIterator`
+  --> arithmetic/src/multilinear_polynomial.rs:13:30
+   |
+13 |     IndexedParallelIterator, IntoParallelIterator, IntoParallelRefIterator,
+   |                              ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `MultilinearExtension`
+  --> arithmetic/src/virtual_polynomial.rs:15:43
+   |
+15 | use ark_poly::{DenseMultilinearExtension, MultilinearExtension, Polynomial};
+   |                                           ^^^^^^^^^^^^^^^^^^^^
+
+warning: `arithmetic` (lib) generated 3 warnings (run `cargo fix --lib -p arithmetic` to apply 2 suggestions)
+warning: unused imports: `Commitment` and `self`
+  --> subroutines/src/pcs/kzhk/mod.rs:10:12
+   |
+10 |     poly::{self, DenseOrSparseMLE},
+   |            ^^^^
+11 |     Commitment, PCSError, PolynomialCommitmentScheme, StructuredReferenceString,
+   |     ^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `univariate::DenseOrSparsePolynomial`
+  --> subroutines/src/pcs/kzhk/mod.rs:16:5
+   |
+16 |     univariate::DenseOrSparsePolynomial, DenseMultilinearExtension, MultilinearExtension,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `RngCore` and `log2`
+  --> subroutines/src/pcs/kzhk/mod.rs:21:55
+   |
+21 |     cfg_into_iter, cfg_iter, cfg_iter_mut, end_timer, log2,
+   |                                                       ^^^^
+22 |     rand::{Rng, RngCore},
+   |                 ^^^^^^^
+
+warning: unused import: `smallvec::SmallVec`
+  --> subroutines/src/pcs/kzhk/mod.rs:25:5
+   |
+25 | use smallvec::SmallVec;
+   |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `collections::BTreeMap`
+  --> subroutines/src/pcs/kzhk/mod.rs:28:5
+   |
+28 |     collections::BTreeMap,
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `cfg_for_each_with_scratch`
+ --> subroutines/src/pcs/kzhk/srs.rs:4:5
+  |
+4 |     cfg_for_each_with_scratch,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `AffineRepr` and `PrimeGroup`
+ --> subroutines/src/pcs/kzhk/srs.rs:9:58
+  |
+9 |     pairing::Pairing, scalar_mul::BatchMulPreprocessing, AffineRepr, CurveGroup, PrimeGroup,
+  |                                                          ^^^^^^^^^^              ^^^^^^^^^^
+
+warning: unused import: `ark_ff::PrimeField`
+  --> subroutines/src/pcs/kzhk/srs.rs:11:5
+   |
+11 | use ark_ff::PrimeField;
+   |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `cfg_into_iter` and `cfg_iter_mut`
+  --> subroutines/src/pcs/kzhk/srs.rs:13:15
+   |
+13 | use ark_std::{cfg_into_iter, cfg_iter_mut, end_timer, rand::Rng, start_timer, One, UniformRand};
+   |               ^^^^^^^^^^^^^  ^^^^^^^^^^^^
+
+warning: unused imports: `IntoParallelRefIterator`, `IntoParallelRefMutIterator`, and `vec`
+  --> subroutines/src/pcs/kzhk/srs.rs:20:56
+   |
+20 |         IndexedParallelIterator, IntoParallelIterator, IntoParallelRefIterator,
+   |                                                        ^^^^^^^^^^^^^^^^^^^^^^^
+21 |         IntoParallelRefMutIterator, ParallelIterator,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+22 |     },
+23 |     vec,
+   |     ^^^
+
+warning: unused import: `evaluate_last_sparse`
+  --> subroutines/src/pcs/kzhk/mod.rs:41:9
+   |
+41 |         evaluate_last_sparse, fix_last_variables, fix_last_variables_boolean,
+   |         ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `default`
+  --> subroutines/src/pcs/mod.rs:11:27
+   |
+11 | use std::{borrow::Borrow, default, fmt::Debug, hash::Hash};
+   |                           ^^^^^^^
+
+warning: unused import: `multilinear_polynomial::fix_first_variables`
+  --> subroutines/src/poly_iop/sum_check/prover.rs:15:5
+   |
+15 |     multilinear_polynomial::fix_first_variables, virtual_polynomial::VirtualPolynomial,
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `ark_poly::DenseMultilinearExtension`
+  --> subroutines/src/poly_iop/sum_check/prover.rs:18:5
+   |
+18 | use ark_poly::DenseMultilinearExtension;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `cfg_iter`
+  --> subroutines/src/poly_iop/sum_check/prover.rs:19:30
+   |
+19 | use ark_std::{cfg_into_iter, cfg_iter, end_timer, start_timer, vec::Vec};
+   |                              ^^^^^^^^
+
+warning: unused import: `IntoParallelRefIterator`
+  --> subroutines/src/poly_iop/sum_check/prover.rs:23:44
+   |
+23 | use rayon::prelude::{IntoParallelIterator, IntoParallelRefIterator};
+   |                                            ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `IndexedParallelIterator`
+  --> subroutines/src/pcs/kzhk/srs.rs:20:9
+   |
+20 |         IndexedParallelIterator, IntoParallelIterator, IntoParallelRefIterator,
+   |         ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `CanonicalDeserialize`
+ --> subroutines/src/poly.rs:6:5
+  |
+6 |     CanonicalDeserialize, CanonicalSerialize, Read, SerializationError, Valid, Write,
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `CanonicalSerialize`
+ --> subroutines/src/poly.rs:6:27
+  |
+6 |     CanonicalDeserialize, CanonicalSerialize, Read, SerializationError, Valid, Write,
+  |                           ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Write`
+ --> subroutines/src/poly.rs:6:80
+  |
+6 |     CanonicalDeserialize, CanonicalSerialize, Read, SerializationError, Valid, Write,
+  |                                                                                ^^^^^
+
+warning: unused import: `Read`
+ --> subroutines/src/poly.rs:6:47
+  |
+6 |     CanonicalDeserialize, CanonicalSerialize, Read, SerializationError, Valid, Write,
+  |                                               ^^^^
+
+warning: variable does not need to be mutable
+   --> subroutines/src/pcs/kzhk/srs.rs:476:16
+    |
+476 | fn pow_le_u128(mut x: u128, k: u32, n: u128) -> bool {
+    |                ----^
+    |                |
+    |                help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` on by default
+
+warning: unused variable: `rng`
+  --> subroutines/src/pcs/kzhk/mod.rs:81:9
+   |
+81 |         rng: &mut R,
+   |         ^^^ help: if this is intentional, prefix it with an underscore: `_rng`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `p`
+   --> subroutines/src/pcs/kzhk/mod.rs:479:13
+    |
+479 |         let p = match proof.get_f() {
+    |             ^ help: if this is intentional, prefix it with an underscore: `_p`
+
+warning: unused variable: `aux`
+   --> subroutines/src/pcs/kzhk/mod.rs:503:21
+    |
+503 |         for ((comm, aux), value) in commitments.iter().zip(auxs.iter()).zip(values.iter()) {
+    |                     ^^^ help: if this is intentional, prefix it with an underscore: `_aux`
+
+warning: unused variable: `prover_param`
+  --> subroutines/src/pcs/mod.rs:63:9
+   |
+63 |         prover_param: impl Borrow<Self::ProverParam>,
+   |         ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_prover_param`
+
+warning: unused variable: `polynomial`
+  --> subroutines/src/pcs/mod.rs:64:9
+   |
+64 |         polynomial: &Self::Polynomial,
+   |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_polynomial`
+
+warning: unused variable: `com`
+  --> subroutines/src/pcs/mod.rs:65:9
+   |
+65 |         com: &Self::Commitment,
+   |         ^^^ help: if this is intentional, prefix it with an underscore: `_com`
+
+warning: unused variable: `aux`
+  --> subroutines/src/pcs/mod.rs:66:9
+   |
+66 |         aux: &mut Self::Aux,
+   |         ^^^ help: if this is intentional, prefix it with an underscore: `_aux`
+
+warning: unused variable: `commitment`
+  --> subroutines/src/pcs/mod.rs:82:9
+   |
+82 |         commitment: &Self::Commitment,
+   |         ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_commitment`
+
+warning: unused variable: `i`
+   --> subroutines/src/poly_iop/sum_check/mod.rs:165:13
+    |
+165 |         for i in 0..num_vars {
+    |             ^ help: if this is intentional, prefix it with an underscore: `_i`
+
+warning: variable does not need to be mutable
+   --> subroutines/src/poly_iop/sum_check/mod.rs:155:9
+    |
+155 |         mut poly: Self::VirtualPolynomial,
+    |         ----^^^^
+    |         |
+    |         help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> subroutines/src/poly.rs:110:23
+    |
+110 |     fn relabel(&self, mut a: usize, mut b: usize, k: usize) -> Self {
+    |                       ----^
+    |                       |
+    |                       help: remove this `mut`
+
+warning: variable does not need to be mutable
+   --> subroutines/src/poly.rs:110:37
+    |
+110 |     fn relabel(&self, mut a: usize, mut b: usize, k: usize) -> Self {
+    |                                     ----^
+    |                                     |
+    |                                     help: remove this `mut`
+
+warning: function `decode_coords` is never used
+   --> subroutines/src/pcs/kzhk/srs.rs:408:4
+    |
+408 | fn decode_coords(mut idx: usize, bases: &[usize], out_coords: &mut Vec<usize>) {
+    |    ^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` on by default
+
+warning: function `test_single_helper` is never used
+ --> subroutines/src/pcs/kzhk/test.rs:5:4
+  |
+5 | fn test_single_helper(
+  |    ^^^^^^^^^^^^^^^^^^
+
+warning: variable `N` should have a snake case name
+   --> subroutines/src/pcs/kzhk/srs.rs:420:27
+    |
+420 | pub fn ceil_k_root_scaled(N: u128, k: u32) -> u128 {
+    |                           ^ help: convert the identifier to snake case: `n`
+    |
+    = note: `#[warn(non_snake_case)]` on by default
+
+warning: variable `N` should have a snake case name
+   --> subroutines/src/pcs/kzhk/srs.rs:455:24
+    |
+455 | fn kth_root_floor_u128(N: u128, k: u32) -> u128 {
+    |                        ^ help: convert the identifier to snake case: `n`
+
+warning: `subroutines` (lib) generated 38 warnings (run `cargo fix --lib -p subroutines` to apply 20 suggestions)
+warning: unused import: `std::error`
+ --> iron-key/src/auditor/errors.rs:1:5
+  |
+1 | use std::error;
+  |     ^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `std::error`
+ --> iron-key/src/client/errors.rs:1:5
+  |
+1 | use std::error;
+  |     ^^^^^^^^^^
+
+warning: unused imports: `hash` and `marker::PhantomData`
+ --> iron-key/src/client/mod.rs:6:5
+  |
+6 |     hash,
+  |     ^^^^
+7 |     marker::PhantomData,
+  |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `transcript::IOPTranscript`
+  --> iron-key/src/client/mod.rs:14:5
+   |
+14 | use transcript::IOPTranscript;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `BulletinBoard`
+  --> iron-key/src/client/mod.rs:18:10
+   |
+18 |     bb::{BulletinBoard, dummybb::DummyBB},
+   |          ^^^^^^^^^^^^^
+
+warning: unused imports: `CanonicalDeserialize` and `CanonicalSerialize`
+  --> iron-key/src/ironkey.rs:12:21
+   |
+12 | use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
+   |                     ^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `BufReader`, `BufWriter`, `Read`, `Write`, `env::current_dir`, and `fs::File`
+  --> iron-key/src/ironkey.rs:15:5
+   |
+15 |     env::current_dir,
+   |     ^^^^^^^^^^^^^^^^
+16 |     fs::File,
+   |     ^^^^^^^^
+17 |     io::{BufReader, BufWriter, Read, Write},
+   |          ^^^^^^^^^  ^^^^^^^^^  ^^^^  ^^^^^
+
+warning: unused import: `pcs`
+  --> iron-key/src/ironkey.rs:20:47
+   |
+20 | use subroutines::{PolynomialCommitmentScheme, pcs, poly::DenseOrSparseMLE};
+   |                                               ^^^
+
+warning: unused import: `std::error`
+ --> iron-key/src/server/errors.rs:1:5
+  |
+1 | use std::error;
+  |     ^^^^^^^^^^
+
+warning: unused import: `rayon::join`
+  --> iron-key/src/server/mod.rs:25:5
+   |
+25 | use rayon::join;
+   |     ^^^^^^^^^^^
+
+warning: unused import: `AdditiveGroup`
+ --> iron-key/src/structs/dictionary.rs:4:14
+  |
+4 | use ark_ec::{AdditiveGroup, pairing::Pairing};
+  |              ^^^^^^^^^^^^^
+
+warning: unused imports: `Field` and `PrimeField`
+ --> iron-key/src/structs/dictionary.rs:5:14
+  |
+5 | use ark_ff::{Field, PrimeField};
+  |              ^^^^^  ^^^^^^^^^^
+
+warning: unused imports: `DenseMultilinearExtension` and `univariate::DenseOrSparsePolynomial`
+ --> iron-key/src/structs/dictionary.rs:7:5
+  |
+7 |     DenseMultilinearExtension, MultilinearExtension, SparseMultilinearExtension,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+8 |     univariate::DenseOrSparsePolynomial,
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `BTreeMap`
+  --> iron-key/src/structs/dictionary.rs:17:19
+   |
+17 |     collections::{BTreeMap, HashMap},
+   |                   ^^^^^^^^
+
+warning: unused import: `ark_std::log2`
+ --> iron-key/src/structs/pp.rs:2:5
+  |
+2 | use ark_std::log2;
+  |     ^^^^^^^^^^^^^
+
+warning: unused import: `ark_poly::DenseMultilinearExtension`
+ --> iron-key/src/structs/pp.rs:5:5
+  |
+5 | use ark_poly::DenseMultilinearExtension;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `CanonicalDeserialize`
+ --> iron-key/src/structs/pp.rs:6:21
+  |
+6 | use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
+  |                     ^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Field`
+ --> iron-key/src/utils.rs:1:14
+  |
+1 | use ark_ff::{Field, PrimeField};
+  |              ^^^^^
+
+warning: unreachable expression
+   --> iron-key/src/client/mod.rs:166:9
+    |
+165 |         todo!();
+    |         ------- any code following this expression is unreachable
+166 |         Ok(())
+    |         ^^^^^^ unreachable expression
+    |
+    = note: `#[warn(unreachable_code)]` on by default
+
+warning: unused variable: `proof`
+   --> iron-key/src/client/mod.rs:143:9
+    |
+143 |         proof: Self::SelfAuditProof,
+    |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_proof`
+    |
+    = note: `#[warn(unused_variables)]` on by default
+
+warning: unused variable: `bulletin_board`
+   --> iron-key/src/client/mod.rs:144:9
+    |
+144 |         bulletin_board: &Self::BulletinBoard,
+    |         ^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bulletin_board`
+
+warning: unused variable: `rng`
+   --> iron-key/src/server/mod.rs:118:17
+    |
+118 |         let mut rng = test_rng();
+    |                 ^^^ help: if this is intentional, prefix it with an underscore: `_rng`
+
+warning: variable does not need to be mutable
+   --> iron-key/src/server/mod.rs:118:13
+    |
+118 |         let mut rng = test_rng();
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` on by default
+
+warning: unused variable: `rng`
+   --> iron-key/src/server/mod.rs:229:17
+    |
+229 |         let mut rng = test_rng();
+    |                 ^^^ help: if this is intentional, prefix it with an underscore: `_rng`
+
+warning: variable does not need to be mutable
+   --> iron-key/src/server/mod.rs:229:13
+    |
+229 |         let mut rng = test_rng();
+    |             ----^^^
+    |             |
+    |             help: remove this `mut`
+
+warning: unused variable: `bulletin_board`
+   --> iron-key/src/server/mod.rs:280:9
+    |
+280 |         bulletin_board: &mut Self::BulletinBoard,
+    |         ^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bulletin_board`
+
+warning: enum `AuditorError` is never used
+ --> iron-key/src/auditor/errors.rs:8:17
+  |
+8 | pub(crate) enum AuditorError {}
+  |                 ^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` on by default
+
+warning: variants `UnknownIndex` and `SelfAuditFailed` are never constructed
+  --> iron-key/src/client/errors.rs:10:5
+   |
+8  | pub(crate) enum ClientError {
+   |                 ----------- variants in this enum
+9  |     #[error("Client does not know its index yet.")]
+10 |     UnknownIndex,
+   |     ^^^^^^^^^^^^
+...
+16 |     SelfAuditFailed,
+   |     ^^^^^^^^^^^^^^^
+   |
+   = note: `ClientError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: variant `AlreadyRegistered` is never constructed
+  --> iron-key/src/server/errors.rs:10:5
+   |
+8  | pub(crate) enum ServerError {
+   |                 ----------- variant in this enum
+9  |     #[error("The current update batch has a label that is already registered.")]
+10 |     AlreadyRegistered,
+   |     ^^^^^^^^^^^^^^^^^
+   |
+   = note: `ServerError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: method `fmt` is never used
+   --> iron-key/src/structs/dictionary.rs:204:8
+    |
+28  | impl<E: Pairing, T: Debug + VKDLabel<E>> IronDictionary<E, T> {
+    | ------------------------------------------------------------- method in this implementation
+...
+204 |     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    |        ^^^
+
+warning: variant `LabelAlreadyExists` is never constructed
+   --> iron-key/src/structs/dictionary.rs:257:5
+    |
+252 | pub(crate) enum DictionaryError {
+    |                 --------------- variant in this enum
+...
+257 |     LabelAlreadyExists(String),
+    |     ^^^^^^^^^^^^^^^^^^
+    |
+    = note: `DictionaryError` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: `iron-key` (lib) generated 31 warnings (run `cargo fix --lib -p iron-key` to apply 20 suggestions)
+warning: unused import: `iron_key_bench::KZH_PARAM`
+  --> iron-key-bench/benches/audit.rs:15:5
+   |
+15 | use iron_key_bench::KZH_PARAM;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `self`
+  --> iron-key-bench/benches/client_lookup.rs:12:14
+   |
+12 |     client::{self, IronClient},
+   |              ^^^^
+
+warning: unused import: `iron_key_bench::KZH_PARAM`
+  --> iron-key-bench/benches/client_lookup.rs:17:5
+   |
+17 | use iron_key_bench::KZH_PARAM;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `iron_key_bench::KZH_PARAM`
+  --> iron-key-bench/benches/server_update_reg.rs:19:5
+   |
+19 | use iron_key_bench::KZH_PARAM;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `server_update_keys::Params` is more private than the item `server_update_keys::PARAMS`
+   --> iron-key-bench/benches/server_update_keys.rs:107:1
+    |
+107 | pub const PARAMS: &[Params] = &{
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ constant `server_update_keys::PARAMS` is reachable at visibility `pub(crate)`
+    |
+note: but type `server_update_keys::Params` is only usable at visibility `pub(self)`
+   --> iron-key-bench/benches/server_update_keys.rs:24:1
+    |
+24  | struct Params(
+    | ^^^^^^^^^^^^^
+    = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `server_update_reg::Params` is more private than the item `server_update_reg::PARAMS`
+   --> iron-key-bench/benches/server_update_reg.rs:116:1
+    |
+116 | pub const PARAMS: &[Params] = &{
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^ constant `server_update_reg::PARAMS` is reachable at visibility `pub(crate)`
+    |
+note: but type `server_update_reg::Params` is only usable at visibility `pub(self)`
+   --> iron-key-bench/benches/server_update_reg.rs:50:1
+    |
+50  | struct Params(
+    | ^^^^^^^^^^^^^
+
+warning: `iron-key-bench` (bench "bench") generated 6 warnings (run `cargo fix --bench "bench"` to apply 4 suggestions)
+    Finished `bench` profile [optimized + debuginfo] target(s) in 0.13s
+     Running benches/bench.rs (target/release/deps/bench-cefc7f195b8f76ca)
+Timer precision: 21 ns
+bench                                                              fastest       │ slowest       │ median        │ mean          │ samples │ iters
+╰─ server_update_reg                                                             │               │               │               │         │
+   ╰─ light_update_reg                                                           │               │               │               │         │
+      ├─ [log(capacity)=22, log(|update|)=4, log(init-update)=2]   
+Cache miss: Creating new IronPublicParameters for log_capacity = 22
+Loading SRS
+Posted bulletin board message size: 6086 bytes
+
+1.998 s       │ 1.998 s       │ 1.998 s       │ 1.998 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=5, log(init-update)=2]   Posted bulletin board message size: 6126 bytes
+
+1.928 s       │ 1.928 s       │ 1.928 s       │ 1.928 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=6, log(init-update)=2]   Posted bulletin board message size: 6126 bytes
+
+1.966 s       │ 1.966 s       │ 1.966 s       │ 1.966 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=7, log(init-update)=2]   Posted bulletin board message size: 6126 bytes
+
+2.014 s       │ 2.014 s       │ 2.014 s       │ 2.014 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=8, log(init-update)=2]   Posted bulletin board message size: 6126 bytes
+
+1.967 s       │ 1.967 s       │ 1.967 s       │ 1.967 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=9, log(init-update)=2]   Posted bulletin board message size: 6126 bytes
+
+1.931 s       │ 1.931 s       │ 1.931 s       │ 1.931 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=10, log(init-update)=2]  Posted bulletin board message size: 6126 bytes
+
+1.939 s       │ 1.939 s       │ 1.939 s       │ 1.939 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=11, log(init-update)=2]  Posted bulletin board message size: 6126 bytes
+
+1.957 s       │ 1.957 s       │ 1.957 s       │ 1.957 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=12, log(init-update)=2]  Posted bulletin board message size: 6126 bytes
+
+2.072 s       │ 2.072 s       │ 2.072 s       │ 2.072 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=13, log(init-update)=2]  Posted bulletin board message size: 6126 bytes
+
+2.116 s       │ 2.116 s       │ 2.116 s       │ 2.116 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=14, log(init-update)=2]  Posted bulletin board message size: 6126 bytes
+
+2.165 s       │ 2.165 s       │ 2.165 s       │ 2.165 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=15, log(init-update)=2]  Posted bulletin board message size: 6126 bytes
+
+2.307 s       │ 2.307 s       │ 2.307 s       │ 2.307 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=16, log(init-update)=2]  Posted bulletin board message size: 6126 bytes
+
+2.488 s       │ 2.488 s       │ 2.488 s       │ 2.488 s       │ 1       │ 1
+      ├─ [log(capacity)=22, log(|update|)=17, log(init-update)=2]  Posted bulletin board message size: 6126 bytes
+
+2.906 s       │ 2.906 s       │ 2.906 s       │ 2.906 s       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=4, log(init-update)=2]   
+Cache miss: Creating new IronPublicParameters for log_capacity = 28
+Loading SRS
+Posted bulletin board message size: 7662 bytes
+
+2.079 m       │ 2.079 m       │ 2.079 m       │ 2.079 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=5, log(init-update)=2]   Posted bulletin board message size: 7662 bytes
+
+2.071 m       │ 2.071 m       │ 2.071 m       │ 2.071 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=6, log(init-update)=2]   Posted bulletin board message size: 7662 bytes
+
+2.077 m       │ 2.077 m       │ 2.077 m       │ 2.077 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=7, log(init-update)=2]   Posted bulletin board message size: 7662 bytes
+
+2.083 m       │ 2.083 m       │ 2.083 m       │ 2.083 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=8, log(init-update)=2]   Posted bulletin board message size: 7662 bytes
+
+2.078 m       │ 2.078 m       │ 2.078 m       │ 2.078 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=9, log(init-update)=2]   Posted bulletin board message size: 7662 bytes
+
+2.078 m       │ 2.078 m       │ 2.078 m       │ 2.078 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=10, log(init-update)=2]  Posted bulletin board message size: 7662 bytes
+
+2.078 m       │ 2.078 m       │ 2.078 m       │ 2.078 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=11, log(init-update)=2]  Posted bulletin board message size: 7662 bytes
+
+2.086 m       │ 2.086 m       │ 2.086 m       │ 2.086 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=12, log(init-update)=2]  Posted bulletin board message size: 7662 bytes
+
+2.078 m       │ 2.078 m       │ 2.078 m       │ 2.078 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=13, log(init-update)=2]  Posted bulletin board message size: 7662 bytes
+
+2.081 m       │ 2.081 m       │ 2.081 m       │ 2.081 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=14, log(init-update)=2]  Posted bulletin board message size: 7662 bytes
+
+2.084 m       │ 2.084 m       │ 2.084 m       │ 2.084 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=15, log(init-update)=2]  Posted bulletin board message size: 7662 bytes
+
+2.089 m       │ 2.089 m       │ 2.089 m       │ 2.089 m       │ 1       │ 1
+      ├─ [log(capacity)=28, log(|update|)=16, log(init-update)=2]  Posted bulletin board message size: 7662 bytes
+
+2.089 m       │ 2.089 m       │ 2.089 m       │ 2.089 m       │ 1       │ 1
+      ╰─ [log(capacity)=28, log(|update|)=17, log(init-update)=2]  Posted bulletin board message size: 7662 bytes
+
+2.106 m       │ 2.106 m       │ 2.106 m       │ 2.106 m       │ 1       │ 1
+
